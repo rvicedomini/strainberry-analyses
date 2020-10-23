@@ -1,0 +1,13 @@
+# sample name: it will be used as a prefix of most output files
+sample: 'mock3' 
+
+# input data
+reads: 'resources/mock/reads' # directory containing fastq.gz files of input reads
+has_qual: True # whether reads have associated base-quality values or not
+
+assembly: 'resources/mock/assembly/flye.fa'
+alignment: 'resources/mock/alignment/flye.bam'
+
+# workflow parameters
+nstrains: 2
+mg_size: 15m  # estimated metagenome size used by either flye or canu

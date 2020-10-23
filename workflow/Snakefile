@@ -1,0 +1,32 @@
+# The main entry point of your workflow.
+# After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
+#report: "report/workflow.rst"
+
+# Common rules, such as fasta/bam indexing, etc.
+include: "rules/common.smk"
+
+# Allow users to fix the underlying OS via singularity.
+#singularity: "docker://continuumio/miniconda3" # Allow users to fix the underlying OS via singularity.
+
+
+rule all:
+    input:
+        f'results/{sample}/sberry_flye-mock3_n{nstrains}/assembly.contigs.fa',
+        f'results/{sample}/sberry_flye-mock3_n{nstrains}/assembly.scaffolds.fa'
+
+
+#rule download_data:
+#    input:
+
+
+# Input generation from raw data
+#include: "rules/assembly.smk"
+#include: "rules/alignment.smk"
+
+# Strainberry rules
+include: "rules/sberry.smk"
+
+# Evaluation rules against available references
+#include: "rules/refeval.smk"
+#include: "rules/plots.smk"
+
