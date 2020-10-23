@@ -16,4 +16,4 @@ rule strainberry:
         "../envs/sberry.yaml"
     threads: 14
     shell:
-        "strainberry -r {input.fasta} -b {input.bam} -o sberry_{wildcards.assembly}_n{wildcards.nstrains} -n {wildcards.nstrains} -t {threads} &>{log}"
+        "strainberry -r {input.fasta} -b {input.bam} -o results/{wildcards.sample}/sberry_{wildcards.assembly}_n{wildcards.nstrains} -n {wildcards.nstrains} -t {threads} &>{log}"
