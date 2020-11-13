@@ -11,8 +11,21 @@ include: "rules/common.smk"
 
 rule all:
     input:
-        f'results/{sample}/sberry_flye-mock3_n{nstrains}/assembly.contigs.fa',
-        f'results/{sample}/sberry_flye-mock3_n{nstrains}/assembly.scaffolds.fa'
+        # strain-oblivious assemblies
+        f'results/{sample}/assemblies/canu.fa',
+        f'results/{sample}/assemblies/flye.fa',
+        # strainberry assemblies
+        f'results/{sample}/assemblies/sberry_canu_n{nstrains}.contigs.fa',
+        f'results/{sample}/assemblies/sberry_canu_n{nstrains}.scaffolds.fa',
+        f'results/{sample}/assemblies/sberry_flye_n{nstrains}.contigs.fa',
+        f'results/{sample}/assemblies/sberry_flye_n{nstrains}.scaffolds.fa',
+        # assembly evaluation
+        f'results/{sample}/assembly_eval/canu.report.tsv',
+        f'results/{sample}/assembly_eval/flye.report.tsv',
+        f'results/{sample}/assembly_eval/sberry_canu_n{nstrains}.contigs.report.tsv',
+        f'results/{sample}/assembly_eval/sberry_canu_n{nstrains}.scaffolds.report.tsv',
+        f'results/{sample}/assembly_eval/sberry_flye_n{nstrains}.contigs.report.tsv',
+        f'results/{sample}/assembly_eval/sberry_flye_n{nstrains}.scaffolds.report.tsv',
 
 
 #rule download_data:
@@ -27,6 +40,6 @@ rule all:
 include: "rules/sberry.smk"
 
 # Evaluation rules against available references
-#include: "rules/refeval.smk"
+include: "rules/assembly_eval.smk"
 #include: "rules/plots.smk"
 
