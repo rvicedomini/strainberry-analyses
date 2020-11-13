@@ -1,0 +1,10 @@
+*
+!config
+!config/**
+!resources
+!workflow
+!workflow/**
+!LICENSE
+!README.md
+!.gitattributes
+!.gitignore
