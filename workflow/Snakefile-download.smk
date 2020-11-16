@@ -113,7 +113,7 @@ rule mock9_fastq:
         for f in {input}; do
             fbase=${{f##*/}}
             fname=${{fbase%.bam}}
-            samtools fastq --threads {threads} ${{f}} | gzip -dc >resources/mock9/reads/${{fname}}.fq.gz
+            samtools fastq --threads {threads} ${{f}} | gzip -c >resources/mock9/reads/${{fname}}.fq.gz
         done
         """
 
@@ -126,28 +126,36 @@ rule mock9_fastq:
 ### NWC2 DATASET ###
 ####################
 
+rule nwc2_dl_references:
+    output: 
+        expand("resources/references/{refname}.fasta", refname=["CP031021.1","CP031023.1","CP031016.1","CP031018.1"])
+    conda: 
+        'envs/ncbi.yaml'
+    shell: 
+        """
+        efetch -format fasta -db nucleotide -id "CP031021.1,CP031023.1,CP031016.1,CP031018.1" \
+                | awk 'BEGIN{{sid="undefined"}} /^>/{{sid=$1}} {{ print >"resources/references/"$1".fasta" }}
+        """
+
 rule nwc2_pacbio_reads:
     input:  ancient("config/nwc2_pacbio.yaml")
     output: "resources/nwc2_pacbio/source/SRR7585901.fastq.gz"
     conda:  "envs/ncbi.yaml"
     shell:  "fasterq-dump -O resources/nwc2_pacbio/source -o SRR7585901.fastq --min-read-len 5000 SRR7585901 && gzip resources/nwc2_pacbio/source/SRR7585901.fastq"
 
-#rule nwc2_pacbio_references:
-#    output:
-#        "resources/nwc2_pacbio/references/sthermophilus_nwc_2_1.fa",
-#        "resources/nwc2_pacbio/references/ldelbrueckii_nwc_2_2.fa",
-#        "resources/nwc2_pacbio/references/lhelveticus_nwc_2_3.fa",
-#        "resources/nwc2_pacbio/references/lhelveticus_nwc_2_4.fa",
-#        "resources/nwc2_pacbio/references.csv"
-#    conda: "envs/ncbi.yaml"
-#    shell:
-#        """
-#        (esearch -db nucleotide -query "CP031021.1" | efetch -format fasta >{output[0]}) && sleep 1 && \
-#        (esearch -db nucleotide -query "CP031023.1" | efetch -format fasta >{output[1]}) && sleep 1 && \
-#        (esearch -db nucleotide -query "CP031016.1" | efetch -format fasta >{output[2]}) && sleep 1 && \
-#        (esearch -db nucleotide -query "CP031018.1" | efetch -format fasta >{output[3]}) && \
-#        (for fpath in {output}; do fbase=${{fpath##*/}}; printf "%s,%s\n" "${{fbase%.fa}}" "$(readlink -f "${{fpath}}")"; done >{output[4]})
-#        """
+rule nwc2_pacbio_reflist:
+    input:
+        expand("resources/references/{refname}.fasta", refname=["CP031021.1","CP031023.1","CP031016.1","CP031018.1"])
+    output: 
+        "resources/nwc2_pacbio/references.csv"
+    shell:
+        """
+        : > {output}
+        printf "%s,%s\n" "sthermophilus_nwc2_1" "$(readlink -f resources/references/CP031021.1.fasta)" >>{output}
+        printf "%s,%s\n" "ldelbrueckii_nwc2_2"  "$(readlink -f resources/references/CP031023.1.fasta)" >>{output}
+        printf "%s,%s\n" "lhelveticus_nwc2_3"   "$(readlink -f resources/references/CP031016.1.fasta)" >>{output}
+        printf "%s,%s\n" "lhelveticus_nwc2_4"   "$(readlink -f resources/references/CP031018.1.fasta)" >>{output}
+        """
 
 rule nwc2_ont_reads:
     input:  ancient("config/nwc2_ont.yaml")
@@ -155,6 +163,19 @@ rule nwc2_ont_reads:
     conda:  "envs/ncbi.yaml"
     shell:  "fasterq-dump -O resources/nwc2_ont/source -o SRR7585900.fastq --min-read-len 10000 SRR7585900 && gzip resources/nwc2_ont/source/SRR7585900.fastq"
 
+rule nwc2_ont_reflist:
+    input:
+        expand("resources/references/{refname}.fasta", refname=["CP031021.1","CP031023.1","CP031016.1","CP031018.1"])
+    output: 
+        "resources/nwc2_ont/references.csv"
+    shell:
+        """
+        : > {output}
+        printf "%s,%s\n" "sthermophilus_nwc2_1" "$(readlink -f resources/references/CP031021.1.fasta)" >>{output}
+        printf "%s,%s\n" "ldelbrueckii_nwc2_2"  "$(readlink -f resources/references/CP031023.1.fasta)" >>{output}
+        printf "%s,%s\n" "lhelveticus_nwc2_3"   "$(readlink -f resources/references/CP031016.1.fasta)" >>{output}
+        printf "%s,%s\n" "lhelveticus_nwc2_4"   "$(readlink -f resources/references/CP031018.1.fasta)" >>{output}
+        """
 
 ###################
 ### HSM DATASET ###
