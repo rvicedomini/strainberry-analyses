@@ -13,16 +13,16 @@ sample = config["sample"]
 nstrains = int(config["nstrains"])
 
 rule samtools_faidx:
-    input:  '{something}.f{asta}'
-    output: '{something}.f{asta}.fai'
-    conda:  '../envs/common.yaml'
+    input:  '{fname}.f{asta}'
+    output: '{fname}.f{asta}.fai'
+    conda:  '../envs/samtools.yaml'
     shell:  'samtools faidx {input}'
 
 
 rule samtools_index:
-    input:  '{something}.bam'
-    output: '{something}.bam.bai'
-    conda:  '../envs/common.yaml'
+    input:  '{fname}.bam'
+    output: '{fname}.bam.bai'
+    conda:  '../envs/samtools.yaml'
     shell:  'samtools index -@ 4 {input}'
 
 
