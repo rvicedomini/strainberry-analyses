@@ -1,0 +1,7 @@
+channels:
+  - bioconda
+  - defaults
+dependencies:
+  - sra-tools==2.10.8
+  - entrez-direct==13.9
+
