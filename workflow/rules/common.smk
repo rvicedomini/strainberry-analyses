@@ -6,7 +6,7 @@ from snakemake.utils import validate
 singularity: "docker://continuumio/miniconda3"
 
 ##### load config and sample sheets #####
-configfile: "config/config.yaml"
+#configfile: "config/config.yaml"
 
 validate(config, schema="../schemas/config.schema.yaml")
 sample = config["sample"]

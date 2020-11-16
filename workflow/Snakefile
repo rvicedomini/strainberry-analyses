@@ -11,6 +11,7 @@ include: "rules/common.smk"
 
 rule all:
     input:
+        # input data
         # strain-oblivious assemblies
         f'results/{sample}/assemblies/canu.fa',
         f'results/{sample}/assemblies/flye.fa',
@@ -26,10 +27,6 @@ rule all:
         f'results/{sample}/assembly_eval/sberry_canu_n{nstrains}.scaffolds.report.tsv',
         f'results/{sample}/assembly_eval/sberry_flye_n{nstrains}.contigs.report.tsv',
         f'results/{sample}/assembly_eval/sberry_flye_n{nstrains}.scaffolds.report.tsv',
-
-
-#rule download_data:
-#    input:
 
 
 # Input generation from raw data
