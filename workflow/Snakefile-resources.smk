@@ -2,7 +2,11 @@
 # After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
 #report: "report/workflow.rst"
 
-localrules: mock9_dl_data, mock9_dl_barcodes, nwc2_dl_references, nwc2_dl_pacbio_reads, nwc2_dl_ont_reads
+localrules: 
+    dl_references,
+    mock9_dl_data, mock9_dl_barcodes, 
+    nwc2_dl_pacbio_reads, nwc2_dl_ont_reads,
+    hsm_dl_reads, hsm_dl_assembly, hsm_dl_references
 
 # Common rules, such as fasta/bam indexing, etc.
 #include: "rules/common.smk"
@@ -13,9 +17,7 @@ localrules: mock9_dl_data, mock9_dl_barcodes, nwc2_dl_references, nwc2_dl_pacbio
 
 rule all:
     input:
-        # Mock9
-        #"resources/mock9/source/MM_10Plex_42MB_SEQUENCING_DATA_EXPRESS2.0.tar.gz",
-        #"resources/mock9/source/Sequel_16_Barcodes_v3.fasta",
+        # Mock datasets
         "resources/mock9/reads/m54081_181221_163846.bc1001_BAK8A_OA--bc1001_BAK8A_OA.fq.gz",
         "resources/mock9/reads/m54081_181221_163846.bc1002_BAK8A_OA--bc1002_BAK8A_OA.fq.gz",
         "resources/mock9/reads/m54081_181221_163846.bc1009_BAK8A_OA--bc1009_BAK8A_OA.fq.gz",
@@ -27,7 +29,6 @@ rule all:
         "resources/mock9/reads/m54081_181221_163846.bc1019_BAK8B_OA--bc1019_BAK8B_OA.fq.gz",
         "resources/mock9/reads/m54081_181221_163846.bc1022_BAK8B_OA--bc1022_BAK8B_OA.fq.gz",
         "resources/mock9/references.csv",
-        # Mock3
         "resources/mock3/reads/m54081_181221_163846.bc1002_BAK8A_OA--bc1002_BAK8A_OA.fq.gz",
         "resources/mock3/reads/m54081_181221_163846.bc1010_BAK8A_OA--bc1010_BAK8A_OA.fq.gz",
         "resources/mock3/reads/m54081_181221_163846.bc1019_BAK8B_OA--bc1019_BAK8B_OA.fq.gz",
@@ -38,6 +39,10 @@ rule all:
         # NWC2 - Nanopore
         "resources/nwc2_ont/reads/SRR7585900.fastq.gz",
         "resources/nwc2_ont/references.csv",
+        # Human Stool Microbiome
+        "resources/hsm/reads/SRR8427258.fastq.gz",
+        "resources/hsm/assembly/GCA_011075405.1.fasta",
+        "resources/hsm/references.csv",
 
 
 #########################
@@ -187,7 +192,6 @@ rule mock9_reflist:
 ### MOCK3 DATASET ###
 #####################
 
-
 rule mock3_fastq:
     input:
         ancient("resources/mock9/reads/m54081_181221_163846.bc1002_BAK8A_OA--bc1002_BAK8A_OA.fq.gz"),
@@ -204,7 +208,6 @@ rule mock3_fastq:
             && ln -s "$(readlink -f {input[1]})" {output[1]} \
             && ln -s "$(readlink -f {input[2]})" {output[2]}
         """
-
 
 rule mock3_reflist:
     input:
@@ -269,5 +272,50 @@ rule nwc2_ont_reflist:
 ### HSM DATASET ###
 ###################
 
+rule hsm_dl_reads:
+    input:  ancient("config/hsm.yaml")
+    output: "resources/hsm/reads/SRR8427258.fastq.gz"
+    conda:  "envs/ncbi.yaml"
+    shell:  "fasterq-dump -O resources/hsm/reads -o SRR8427258.fastq SRR8427258 && gzip resources/hsm/reads/SRR8427258.fastq"
 
+rule hsm_dl_assembly:
+    input:  ancient('config/hsm.yaml')
+    output: 'resources/hsm/assembly/GCA_011075405.1.fasta'
+    conda:  'envs/ncbi.yaml'
+    shell:  
+        '''
+        mkdir -p resources/hsm/assembly
+        esearch -db assembly -query "GCA_011075405.1" \
+                | efetch -format docsum \
+                | xtract -pattern DocumentSummary -element FtpPath_GenBank \
+                | xargs -n 1 bash -c 'curl -s -L "${{0}}/${{0##*/}}_genomic.fna.gz" | gzip -dc >{output}'
+        '''
 
+rule hsm_dl_references:
+    input: 
+        ancient("config/hsm.yaml")
+    output: 
+        "resources/references/NZ_AEDR00000000.1.fasta",
+        "resources/references/NZ_AEDS00000000.1.fasta",
+    conda: 
+        'envs/ncbi.yaml'
+    shell:
+        """
+        mkdir -p resources/references
+        esearch -db nucleotide -query "NZ_AEDR01000001.1:NZ_AEDR01000063.1[PACC]" | efetch -format fasta > resources/references/NZ_AEDR00000000.1.fasta
+        sleep 2 && esearch -db nucleotide -query "NZ_AEDS01000001.1:NZ_AEDS01000070.1[PACC]" | efetch -format fasta > resources/references/NZ_AEDS00000000.1.fasta
+        """
+
+rule hsm_reflist:
+    input:
+        "resources/references/NZ_AEDR00000000.1.fasta",
+        "resources/references/NZ_AEDS00000000.1.fasta",
+    output: 
+        "resources/hsm/references.csv"
+    shell:
+        """
+        mkdir -p resources/hsm
+        : > {output}
+        printf "%s,%s\\n" "Vatypica-ACS-049-V-Sch6" "$(readlink -f resources/references/NZ_AEDR00000000.1.fasta)" >>{output}
+        printf "%s,%s\\n" "Vatypica-ACS-134-V-Col7a" "$(readlink -f resources/references/NZ_AEDS00000000.1.fasta)" >>{output}
+        """
