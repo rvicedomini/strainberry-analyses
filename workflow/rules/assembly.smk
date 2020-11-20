@@ -15,6 +15,7 @@ rule flye_assembly:
         mgsize = config['mg_size']
     shell:
         """
+        mkdir -p results/{wildcards.sample}/assemblies
         flye --meta --out-dir results/{wildcards.sample}/assemblies/flye --genome-size {params.mgsize} --threads {threads} {params.readtype} {input.reads} &>{log} \
           && cp results/{wildcards.sample}/assemblies/flye/assembly.fasta {output[0]}
         """
@@ -40,6 +41,7 @@ rule canu_assembly:
         mgsize = config['mg_size'],
     shell:
         """
+        mkdir -p results/{wildcards.sample}/assemblies
         canu -p assembly -d results/{wildcards.sample}/assemblies/canu/ genomeSize={params.mgsize} maxThreads={threads} useGrid=false {params.readtype} {input.reads} &>{log} \
           && cp results/{wildcards.sample}/assemblies/canu/assembly.contigs.fasta {output[0]}
         """

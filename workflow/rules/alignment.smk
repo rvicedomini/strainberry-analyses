@@ -19,6 +19,7 @@ if config['read_has_qual']:
             bamthreads = min(4,workflow.cores)
         shell:
             """
+            mkdir -p results/{wildcards.sample}/alignments
             minimap2 -t {threads} -2 -ax {params.preset} {input.assembly} {input.reads} 2>{log} \
               | samtools sort --threads {threads} \
               | samtools view {params.subsample} --threads 4 -bSh -o {output.bam} -
@@ -44,6 +45,7 @@ else:
             bamthreads = min(4,workflow.cores)
         shell:
             """
+            mkdir -p results/{wildcards.sample}/alignments
             minimap2 -t {threads} -2 -ax {params.preset} {input.assembly} {input.reads} 2>{log} \
               | samtools sort --threads {threads} \
               | samtools view {params.subsample} --threads {params.bamthreads} -bSh - \
