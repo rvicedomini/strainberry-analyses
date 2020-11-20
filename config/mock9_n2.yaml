@@ -1,5 +1,5 @@
 # dataset/run identifier
-sample: 'mock9_n2'
+sample: 'mock9'
 
 # sequencing technology of input reads (either 'pacbio' or 'nanopore')
 technology: 'pacbio'
