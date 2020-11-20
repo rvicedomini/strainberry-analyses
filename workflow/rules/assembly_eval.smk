@@ -13,7 +13,7 @@ rule assembly_stats:
         workflow.cores
     shell:
         """
-        python3 workflow/scripts/assembly_stats.py -f {input.fasta} -r {input.references} -o results/{sample}/assembly_eval/{wildcards.assembly} -t {threads} &>{log} \
+        python3 workflow/scripts/assembly_stats.py -f {input.fasta} -r {input.references} -o results/{sample}/assembly_eval/{wildcards.assembly} -t {threads} &>{log}
         cp results/{sample}/assembly_eval/{wildcards.assembly}/report.tsv {output[0]}
         """
 
