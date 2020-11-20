@@ -60,7 +60,7 @@ rule all:
 include: "rules/utils.smk"
 
 # Retrieve resources and define read directory
-#include: "rules/mock_resources.smk"
+include: "rules/mock_resources.smk"
 
 # Generation of input for Strainberry
 include: "rules/assembly.smk"

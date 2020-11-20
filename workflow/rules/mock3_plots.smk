@@ -69,13 +69,14 @@ rule mock3_circos_plot:
     output: 
         'results/mock3/assembly_eval/mock3_circos.svg'
     log:
-        'logs/mock9/circos_mock3.log'
+        'logs/mock3/circos_mock3.log'
     conda: 
         '../envs/circos.yaml'
     shell: 
         """
+        logfile="$(readlink -f {log})"
         cd results/mock3/assembly_eval/circos \
-          && env PERL5LIB= PERL_LOCAL_LIB_ROOT= circos -conf etc/mock3.conf >{log} \
+          && env PERL5LIB= PERL_LOCAL_LIB_ROOT= circos -conf etc/mock3.conf >${{logfile}} \
           && cp mock3_circos.svg ../
         """
 

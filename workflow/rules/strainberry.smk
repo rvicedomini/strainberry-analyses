@@ -18,7 +18,7 @@ rule strainberry:
     shell:
         """
         strainberry -r {input.fasta} -b {input.bam} -o results/{wildcards.sample}/assemblies/sberry_{wildcards.assembly}_n{params.nstrains} -n {params.nstrains} -t {threads} &>{log} \
-          && ln -s $(readlink -f results/{wildcards.sample}/assemblies/sberry_{wildcards.assembly}/assembly.contigs.fa) {output.sberry_ctg} \
-          && ln -s $(readlink -f results/{wildcards.sample}/assemblies/sberry_{wildcards.assembly}/assembly.scaffolds.fa) {output.sberry_scf}
+          && ln -s $(readlink -f results/{wildcards.sample}/assemblies/sberry_{wildcards.assembly}_n{params.nstrains}/assembly.contigs.fa) {output.sberry_ctg} \
+          && ln -s $(readlink -f results/{wildcards.sample}/assemblies/sberry_{wildcards.assembly}_n{params.nstrains}/assembly.scaffolds.fa) {output.sberry_scf}
         """
 

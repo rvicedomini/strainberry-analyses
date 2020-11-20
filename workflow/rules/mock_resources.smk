@@ -70,8 +70,8 @@ rule mock_demultiplex:
         """
         tar -xf resources/mock/source/MM_10Plex_42MB_SEQUENCING_DATA_EXPRESS2.0.tar.gz -C resources/mock/source \
           && mkdir -p resources/mock/reads/demultiplexed \
-          && lima --num-threads {threads} --same --split-bam-named --peek-guess \
-               resources/mock/source/MM_10Plex_42MB_SEQUENCING_DATA_EXPRESS2.0/m54081_181221_163846.subreads.bam \
+          && lima --num-threads {threads} --split-bam-named --peek-guess \
+               resources/mock/source/MM_10Plex_42MB_SEQUENCING_DATA_EXPRESS2.0/m54081_181221_163846.subreadset.xml \
                resources/mock/source/Sequel_16_Barcodes_v3.fasta \
                resources/mock/reads/demultiplexed/m54081_181221_163846.bam \
           && rm -r resources/mock/source/MM_10Plex_42MB_SEQUENCING_DATA_EXPRESS2.0
@@ -83,7 +83,7 @@ rule mock_fastq:
     output: 
         'resources/mock/reads/{fname}.fq.gz'
     conda: 
-        '../envs/samtools.yaml'
+        '../envs/alignment.yaml'
     threads: 
         4
     shell: 
