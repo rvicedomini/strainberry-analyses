@@ -2,6 +2,9 @@
 !config
 !config/**
 !resources
+!resources/mock
+!resources/mock/circos
+!resources/mock/circos/**
 !workflow
 !workflow/**
 !LICENSE

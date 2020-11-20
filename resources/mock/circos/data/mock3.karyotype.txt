@@ -1,0 +1,4 @@
+# E. coli strains
+chr - NC_000913.3 E.coli-K12 0 4641652 chr1
+chr - NZ_CP034551.1 B.cereus 0 5416249 chr2
+chr - NC_017664.1 E.coli-W 0 4897452 chr3

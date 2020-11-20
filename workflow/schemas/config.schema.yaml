@@ -8,10 +8,17 @@ type: object
 properties:
     sample:
         type: string
+        description: sample name/identifier
+    technology:
+        type: string
+        description: sequencing technology (nanopore or pacbio)
+        pattern: "^(pacbio)|(nanopore)$"
     nstrains:
         type: number
+        description: strainberry's strain multiplicity
 
 # entries that have to be in the config file for successful validation
 required:
   - sample
+  - technology
   - nstrains

@@ -8,7 +8,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('-b','--bam', dest='bamFile', required=True, help='input BAM file (use - for reading from stdin)')
     parser.add_argument('-o','--output', dest='outFile', required=True, help='output BAM files')
-    parser.add_argument('-t','--nthreads', dest='nthreads', type=int, default=int(4), help='number of threads for compressing/decompressing BAM files')
+    parser.add_argument('-t','--threads', dest='threads', type=int, default=int(4), help='number of threads for compressing/decompressing BAM files')
     opt = parser.parse_args()
 
     validParameters=True
@@ -18,8 +18,8 @@ def main(argv=None):
     if not validParameters:
         return 1
 
-    with pysam.AlignmentFile(opt.bamFile,'rb',threads=opt.nthreads) as inBam:
-        with pysam.AlignmentFile(opt.outFile,'wb',template=inBam,threads=opt.nthreads) as outBam:
+    with pysam.AlignmentFile(opt.bamFile,'rb',threads=opt.threads) as inBam:
+        with pysam.AlignmentFile(opt.outFile,'wb',template=inBam,threads=opt.threads) as outBam:
             for read in inBam:
                 if read.query_sequence is not None:
                     read.query_qualities=[20]*read.query_length

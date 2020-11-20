@@ -1,5 +1,5 @@
 channels:
   - bioconda
 dependencies:
-  - lima==1.11.0
-
+  - flye==2.7
+  - canu==2.0
