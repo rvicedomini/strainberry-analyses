@@ -70,7 +70,7 @@ include: "rules/alignment.smk"
 include: "rules/strainberry.smk"
 
 # Evaluation rules against available references
-include: "rules/assembly_eval.smk"
+include: "rules/mock_assembly_eval.smk"
 
 # Specific plots for Mock3 and Mock9
 include: "rules/mock3_plots.smk"
