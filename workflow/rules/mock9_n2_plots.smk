@@ -18,7 +18,7 @@ rule mock9_n2_barplots:
             egrep -v '^#' ${{f}} | egrep 'Kpneumoniae|Saureus-ATCC|Saureus-FDAA' \
               | awk -v asmname=${{asmname}} '{{OFS="\\t";print asmname,$0}}'
         done >{output[0]}
-        python3 workflow/scripts/assembly_barplots.py -i {output[0]} -p results/mock9_n2/assembly_eval/mock9_n2
+        python3 workflow/scripts/assembly_barplots.py -i {output[0]} -p results/mock9/assembly_eval/mock9_n2
         """
 
 rule mock9_n2_circos_config:
@@ -68,14 +68,15 @@ rule mock9_n2_circos_plot:
         'results/mock9/assembly_eval/circos_mock9_n2/data/sberry_flye_n2_scf.snps.int.tsv',
     output: 
         'results/mock9/assembly_eval/mock9_n2_circos.svg'
-    log:   
+    log:
         'logs/mock9/circos_mock9_n2.log'
     conda: 
         '../envs/circos.yaml'
     shell: 
         """
+        logfile="$(readlink -f {log})"
         cd results/mock9/assembly_eval/circos_mock9_n2 \
-          && env PERL5LIB= PERL_LOCAL_LIB_ROOT= circos -conf etc/mock9_n2.conf &>{log} \
+          && env PERL5LIB= PERL_LOCAL_LIB_ROOT= circos -conf etc/mock9_n2.conf &>"${{logfile}}" \
           && cp mock9_n2_circos.svg ../
         """
 

@@ -18,7 +18,7 @@ rule mock9_n3_barplots:
             egrep -v '^#' ${{f}} | egrep 'Ecoli-K12|Ecoli-W|Ssonnei' \
               | awk -v asmname=${{asmname}} '{{OFS="\\t";print asmname,$0}}'
         done >{output[0]}
-        python3 workflow/scripts/assembly_barplots.py -i {output[0]} -p results/mock9_n3/assembly_eval/mock9_n3
+        python3 workflow/scripts/assembly_barplots.py -i {output[0]} -p results/mock9/assembly_eval/mock9_n3
         """
 
 rule mock9_n3_circos_config:
@@ -75,8 +75,9 @@ rule mock9_n3_circos_plot:
         '../envs/circos.yaml'
     shell: 
         """
+        logfile="$(readlink -f {log})"
         cd results/mock9/assembly_eval/circos_mock9_n3 \
-          && env PERL5LIB= PERL_LOCAL_LIB_ROOT= circos -conf etc/mock9_n3.conf &>{log} \
+          && env PERL5LIB= PERL_LOCAL_LIB_ROOT= circos -conf etc/mock9_n3.conf &>"${{logfile}}" \
           && cp mock9_n3_circos.svg ../
         """
 
