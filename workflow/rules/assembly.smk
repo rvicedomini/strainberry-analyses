@@ -9,7 +9,7 @@ rule flye_assembly:
     conda:   
         '../envs/assembly.yaml'
     threads:
-        12 #workflow.cores
+        workflow.cores
     params:
         readtype = '--nano-raw' if config['technology'] == 'nanopore' else '--pacbio-raw',
         mgsize = config['mg_size']
@@ -35,7 +35,7 @@ rule canu_assembly:
     conda:   
         '../envs/assembly.yaml'
     threads:
-        12 #workflow.cores
+        workflow.cores
     params:
         readtype = '-nanopore' if config['technology'] == 'nanopore' else '-pacbio',
         mgsize = config['mg_size'],
