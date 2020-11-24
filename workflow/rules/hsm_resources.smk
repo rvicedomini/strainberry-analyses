@@ -22,8 +22,6 @@ rule hsm_dl_assembly:
         '''
 
 rule hsm_dl_references:
-    input: 
-        ancient("config/hsm.yaml")
     output: 
         "resources/hsm/references/NZ_AEDR00000000.1.fasta",
         "resources/hsm/references/NZ_AEDS00000000.1.fasta",
@@ -48,3 +46,20 @@ rule hsm_reflist:
           && printf "%s,%s\\n" "Vatypica-ACS-049-V-Sch6" "$(readlink -f resources/hsm/references/NZ_AEDR00000000.1.fasta)"  | tee --append {output[0]} >/dev/null
           && printf "%s,%s\\n" "Vatypica-ACS-134-V-Col7a" "$(readlink -f resources/hsm/references/NZ_AEDS00000000.1.fasta)" | tee --append {output[0]} >/dev/null
         """
+
+if config['download_kraken2_db']:
+    rule hsm_dl_references:
+        output:
+            'resources/maxikraken2_1903_140GB/hash.k2d',
+            'resources/maxikraken2_1903_140GB/opts.k2d',
+            'resources/maxikraken2_1903_140GB/taxo.k2d',
+        conda:
+            'envs/ncbi.yaml'
+        shell:
+            """
+            mkdir -p resources/maxikraken2_1903_140GB && cd resources/maxikraken2_1903_140GB \
+              && wget --quiet -c https://refdb.s3.climb.ac.uk/maxikraken2_1903_140GB/hash.k2d \
+              && wget --quiet https://refdb.s3.climb.ac.uk/maxikraken2_1903_140GB/opts.k2d \
+              && wget --quiet https://refdb.s3.climb.ac.uk/maxikraken2_1903_140GB/taxo.k2d
+            """
+
