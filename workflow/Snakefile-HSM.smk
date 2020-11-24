@@ -14,20 +14,20 @@ snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
 sample = config["sample"]
 
 
-def hsm_plots(sample):
-    plot_files = []
-    if nstrains == 2:
-        plot_files = [
-            f'results/{sample}/assembly_eval/refcoverage_Sthermophilus_NWC_2_1-flye.svg',
-            f'results/{sample}/assembly_eval/refcoverage_Ldelbrueckii_NWC_2_2-flye.svg',
-            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_3-flye.svg',
-            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_4-flye.svg',
-            f'results/{sample}/assembly_eval/refcoverage_Sthermophilus_NWC_2_1-canu.svg',
-            f'results/{sample}/assembly_eval/refcoverage_Ldelbrueckii_NWC_2_2-canu.svg',
-            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_3-canu.svg',
-            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_4-canu.svg',
-        ]
-    return plot_files
+#def hsm_plots(sample):
+#    plot_files = []
+#    if nstrains == 2:
+#        plot_files = [
+#            f'results/{sample}/assembly_eval/refcoverage_Sthermophilus_NWC_2_1-flye.svg',
+#            f'results/{sample}/assembly_eval/refcoverage_Ldelbrueckii_NWC_2_2-flye.svg',
+#            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_3-flye.svg',
+#            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_4-flye.svg',
+#            f'results/{sample}/assembly_eval/refcoverage_Sthermophilus_NWC_2_1-canu.svg',
+#            f'results/{sample}/assembly_eval/refcoverage_Ldelbrueckii_NWC_2_2-canu.svg',
+#            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_3-canu.svg',
+#            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_4-canu.svg',
+#        ]
+#    return plot_files
 
 
 rule all:
@@ -43,10 +43,23 @@ rule all:
         # strainberry separation of lathe reference assembly
         f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_ctg.fa',
         f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_scf.fa',
-        # assembly evaluation stats
-        #f'results/{sample}/assembly_eval/flye.report.tsv',
-        # reference coverage plots
-        #nwc2_plots(sample),
+        # TODO strainberry polished contig assembly
+        f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_ctg.polished.fa',
+        # kraken2 classification of contigs
+        f'results/{sample}/kraken2/lathe-p1.kraken2',
+        f'results/{sample}/kraken2/sberry_lathe-p1_n{nstrains}_ctg.kraken2',
+        f'results/{sample}/kraken2/sberry_lathe-p1_n{nstrains}_ctg.polished.kraken2',
+        # binning
+        f'results/{sample}/binning/lathe-p1.depth.txt',
+        f'results/{sample}/binning/sberry_lathe-p1_n{nstrains}_ctg.depth.txt',
+        f'results/{sample}/binning/sberry_lathe-p1_n{nstrains}_ctg.polished.depth.txt',
+        # TODO best bins
+        f'results/{sample}/assembly_eval/lathe-p1.best.tsv',
+        f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.best.tsv',
+        f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.polished.best.tsv',
+        # pre/post separation plot
+        f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.barplot.pdf',
+
 
 
 # Common utilities (e.g., samtools faidx/index)
@@ -62,9 +75,12 @@ include: "rules/alignment.smk"
 # Strainberry rules
 include: "rules/strainberry.smk"
 
-# Evaluation rules against available references
+# Polishing
+#include: 'rules/polishing.smk'
+
+# Evaluation rules of generated assemblies (classification, binning, etc.)
 include: "rules/hsm_evaluation.smk"
 
-# Specific plots for Mock3 and Mock9
-#include: "rules/nwc2_plots.smk"
+# Specific plots for HSM
+#include: "rules/hsm_plots.smk"
 
