@@ -33,7 +33,7 @@ def nwc2_plots(sample):
 
 rule all:
     input:
-        # NWC2 - ONT resources
+        # NWC2 - reads and references
         expand('{basepath}/{filename}', basepath=config['read_basepath'], filename=config['read_filenames']),
         config['ref_csv'],
         # strainberry input: strain-oblivious assemblies & alignments
@@ -73,6 +73,6 @@ include: "rules/strainberry.smk"
 # Evaluation rules against available references
 include: "rules/nwc2_assembly_eval.smk"
 
-# Specific plots for Mock3 and Mock9
+# Specific plots for NWC2
 include: "rules/nwc2_plots.smk"
 
