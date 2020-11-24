@@ -1,0 +1,32 @@
+# dataset/run identifier
+sample: 'hsm'
+
+# sequencing technology of input reads (either 'pacbio' or 'nanopore')
+technology: 'nanopore'
+
+# directory which contains input reads
+read_basepath: 'resources/hsm/reads' 
+# list of read file names to be used
+read_filenames: [ 
+    "SRR8427258.fastq.gz",
+    ]
+# whether read sequences have associated base-quality values
+read_has_qual: True
+
+# CSV-formatted file of: reference-id, reference-fasta-path
+ref_csv: 'resources/hsm/vatypica.references.csv'
+
+# Strainberry's -n parameter (strain multiplicity)
+nstrains: 2 
+
+# Estimated metagenome size used by flye
+mg_size: 160m
+
+# Whether to perform read alignment downsampling or not
+subsample: False
+# Value of -s option of samtools view for downsampling (used only if 'subsample' is set to True)
+subsample_frac: 0.99
+
+download_kraken2_db: False
+kraken2_db: 'resources/maxikraken2_1903_140GB'
+
