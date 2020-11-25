@@ -13,7 +13,7 @@ rule nwc2_assembly_align:
         workflow.cores
     shell:
         """
-        refpath="$(awk -F, -v rid="{wildcards.refname}" '$1==rid{{printf("%s",$2);exit}}' {input.ref_csv})"
+        refpath="$( awk -F, -v rid="{wildcards.refname}" '$1==rid{{printf("%s",$2);exit}}' "{input.ref_csv}" )"
         minimap2 -ax asm20 -t {threads} --cs "${{refpath}}" {input.asm} | samtools sort --threads {threads} -o {output.bam}
         """
 
@@ -47,9 +47,10 @@ rule nwc2_refcoverage_plot:
         maxcov=nwc2_maxcov
     shell:
         """
-        mosdepth -t {threads} --by 20000 -m -x ./mosdepth/{wildcards.assembly}-{wildcards.refname} {input.bam1} >{log} \
-            && mosdepth -t {threads} --by 20000 -m -x ./mosdepth/{wildcards.assembly}-{wildcards.refname} {input.bam2} >{log} \
-            && python3 workflow/scripts/assembly_refcoverage.py -m {params.maxcov} -b {output.bedgz1} {output.bedgz2} \
-                 -p refcoverage_{wildcards.refname}-{wildcards.assembly} >>{log}
+        mkdir -p results/{wildcards.sample}/assembly_eval/mosdepth \
+          && mosdepth -t {threads} --by 20000 -m -x results/{wildcards.sample}/assembly_eval/mosdepth/{wildcards.assembly}-{wildcards.refname} {input.bam1} >{log} \
+          && mosdepth -t {threads} --by 20000 -m -x results/{wildcards.sample}/assembly_eval/mosdepth/sberry_{wildcards.assembly}_n2_scf-{wildcards.refname} {input.bam2} >{log} \
+          && python3 workflow/scripts/assembly_refcoverage.py -m {params.maxcov} -b {output.bedgz1} {output.bedgz2} \
+               -p results/{wildcards.sample}/assembly_eval/refcoverage_{wildcards.refname}-{wildcards.assembly} >>{log}
         """
 
