@@ -71,7 +71,7 @@ include: "rules/alignment.smk"
 include: "rules/strainberry.smk"
 
 # Evaluation rules against available references
-include: "rules/nwc2_assembly_eval.smk"
+include: "rules/nwc2_evaluation.smk"
 
 # Specific plots for NWC2
 include: "rules/nwc2_plots.smk"
