@@ -26,7 +26,7 @@ def main( argv = None ):
     with os.scandir(opt.binDir) as it, open(opt.outFile,'w') as out:
         for entry in it:
             if entry.name.endswith(f'.{opt.binExt}'):
-                binid   = os.path.splitext(entry.name)[0]
+                binid = os.path.splitext(entry.name)[0]
                 for seqid in fasta_ids(os.path.join(opt.binDir,entry.name)):
                     out.write(f'{seqid}\t{binid}\n')
     
