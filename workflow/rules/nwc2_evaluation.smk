@@ -17,32 +17,34 @@ rule nwc2_assembly_stats:
         workflow.cores
     shell:
         """
-        python3 workflow/scripts/assembly_stats.py -f {input.fasta} -r {input.references} -o results/{sample}/assembly_eval/{wildcards.assembly} -t {threads} &>{log}
-        cp results/{sample}/assembly_eval/{wildcards.assembly}/report.tsv {output[0]}
+        python3 workflow/scripts/assembly_stats.py -f {input.fasta} -r {input.references} -o results/{wildcards.sample}/assembly_eval/{wildcards.assembly} -t {threads} &>{log}
+        cp results/{wildcards.sample}/assembly_eval/{wildcards.assembly}/report.tsv {output[0]}
         """
+
+rule nwc2_checkm_bacteria:
+    output: 'results/{sample}/assembly_eval/checkm/bacteria.ms'
+    conda:  '../envs/assembly_eval.yaml'
+    shell:  'mkdir -p results/{wildcards.sample}/assembly_eval/checkm && checkm taxon_set domain Bacteria {output[0]}'
+
 
 rule nwc2_checkm_stats:
     input:
-        'results/{sample}/assembly_eval/{assembly}.report.tsv',
+        asmdir=directory('results/{sample}/assembly_eval/{assembly}'),
+        asmrep='results/{sample}/assembly_eval/{assembly}.report.tsv',
+        bacms='results/{sample}/assembly_eval/checkm/bacteria.ms',
     output:
-        'results/{sample}/assembly_eval/{assembly}.checkm.tsv'
+        checkm=directory('results/{sample}/assembly_eval/checkm/{assembly}'),
+        tsv='results/{sample}/assembly_eval/{assembly}.checkm.tsv',
     log:
         'logs/{sample}/{assembly}_checkm.log'
     conda:
         "../envs/assembly_eval.yaml"
-    threads:
-        workflow.cores
+    threads: 
+        8
     shell:
         """
-        mkdir -p results/{sample}/assembly_eval/checkm_{assembly} \
-          && checkm taxon_set domain Bacteria \
-               results/{sample}/assembly_eval/checkm_{assembly}/bacteria.ms 2>{log} \
-          && checkm analyze -x fa -t {threads} \
-               results/{sample}/assembly_eval/checkm_{assembly}/bacteria.ms \
-               results/{sample}/assembly_eval/{assembly}/ \
-               results/{sample}/assembly_eval/checkm_{assembly} 2>>{log} \
-          && checkm qa --tab_table -f {output[0]} \
-               results/{sample}/assembly_eval/checkm_{assembly}/bacteria.ms \
-               results/{sample}/assembly_eval/checkm_{assembly} 2>>{log}
+        mkdir -p {output.checkm} \
+          && checkm analyze -x fa -t {threads} {input.bacms} {input.asmdir} {output.checkm} 2>{log} \
+          && checkm qa --tab_table -f {output.tsv} {input.bacms} {output.checkm} 2>>{log}
         """
 

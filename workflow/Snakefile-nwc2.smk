@@ -53,6 +53,13 @@ rule all:
         f'results/{sample}/assembly_eval/canu.report.tsv',
         f'results/{sample}/assembly_eval/sberry_canu_n{nstrains}_ctg.report.tsv',
         f'results/{sample}/assembly_eval/sberry_canu_n{nstrains}_scf.report.tsv',
+        # checkm evaluation
+        f'results/{sample}/assembly_eval/flye.checkm.tsv',
+        f'results/{sample}/assembly_eval/sberry_flye_n{nstrains}_ctg.checkm.tsv',
+        f'results/{sample}/assembly_eval/sberry_flye_n{nstrains}_scf.checkm.tsv',
+        f'results/{sample}/assembly_eval/canu.checkm.tsv',
+        f'results/{sample}/assembly_eval/sberry_canu_n{nstrains}_ctg.checkm.tsv',
+        f'results/{sample}/assembly_eval/sberry_canu_n{nstrains}_scf.checkm.tsv',
         # reference coverage plots
         nwc2_plots(sample),
 
