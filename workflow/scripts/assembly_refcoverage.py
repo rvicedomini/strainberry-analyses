@@ -7,7 +7,7 @@ from collections import defaultdict
 def load_bed(fname):
     outList=[]
     with gzip.open(fname,'rt') as bedFile:
-        for line in bedfile:
+        for line in bedFile:
             cols=line.rstrip().split('\t')
             chrom=cols[0]
             begin=int(cols[1])
