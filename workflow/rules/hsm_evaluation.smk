@@ -41,7 +41,7 @@ rule hsm_metabat2:
 rule hsm_checkm_eval:
     input:
         depth='results/{sample}/binning/{assembly}.depth.txt',
-        bins=directory('results/{sample}/binning/{assembly}'),
+        bins='results/{sample}/binning/{assembly}',
     output:
         checkm='results/{sample}/assembly_eval/{assembly}.checkm.tsv'
     log:
