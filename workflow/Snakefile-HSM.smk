@@ -43,22 +43,20 @@ rule all:
         # strainberry separation of lathe reference assembly
         f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_ctg.fa',
         f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_scf.fa',
-        # TODO strainberry polished contig assembly
-        f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_ctg.polished.fa',
+        # strainberry polished contig assembly
+        f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_ctg.medaka.fa',
         # kraken2 classification of contigs
         f'results/{sample}/kraken2/lathe-p1.kraken2',
-        f'results/{sample}/kraken2/sberry_lathe-p1_n{nstrains}_ctg.kraken2',
-        f'results/{sample}/kraken2/sberry_lathe-p1_n{nstrains}_ctg.polished.kraken2',
+        f'results/{sample}/kraken2/sberry_lathe-p1_n{nstrains}_ctg.medaka.kraken2',
         # binning
         f'results/{sample}/binning/lathe-p1.depth.txt',
-        f'results/{sample}/binning/sberry_lathe-p1_n{nstrains}_ctg.depth.txt',
-        f'results/{sample}/binning/sberry_lathe-p1_n{nstrains}_ctg.polished.depth.txt',
+        f'results/{sample}/binning/sberry_lathe-p1_n{nstrains}_ctg.medaka.depth.txt',
         # TODO best bins
-        f'results/{sample}/assembly_eval/lathe-p1.best.tsv',
-        f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.best.tsv',
-        f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.polished.best.tsv',
-        # pre/post separation plot
-        f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.barplot.pdf',
+        #f'results/{sample}/assembly_eval/lathe-p1.best.tsv',
+        #f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.best.tsv',
+        #f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.polished.best.tsv',
+        # TODO pre/post separation plot
+        #f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.barplot.pdf',
 
 
 
@@ -76,7 +74,7 @@ include: "rules/alignment.smk"
 include: "rules/strainberry.smk"
 
 # Polishing
-#include: 'rules/polishing.smk'
+include: 'rules/hsm_polishing.smk'
 
 # Evaluation rules of generated assemblies (classification, binning, etc.)
 include: "rules/hsm_evaluation.smk"
