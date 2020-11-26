@@ -1,7 +1,8 @@
 # FASTA index generation
 rule samtools_faidx:
-    input:  '{fname}.f{asta}'
-    output: '{fname}.f{asta}.fai'
+    input:  '{fname}.{faext}'
+    output: '{fname}.{faext}.fai'
+    wildcard_constraints: faext="fa|fasta|fna"
     conda:  '../envs/alignment.yaml'
     shell:  'samtools faidx {input}'
 
