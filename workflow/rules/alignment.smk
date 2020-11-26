@@ -12,7 +12,7 @@ if config['read_has_qual']:
         conda:
             '../envs/alignment.yaml'
         threads:
-            12 #workflow.cores
+            workflow.cores
         params:
             preset = 'map-ont' if config['technology'] == 'nanopore' else 'map-pb',
             subsample = f'-s {config["subsample_frac"]}' if config['subsample'] else '',
@@ -38,7 +38,7 @@ else:
         conda:
             '../envs/alignment.yaml'
         threads:
-            12 #workflow.cores
+            workflow.cores
         params:
             preset = 'map-ont' if config['technology'] == 'nanopore' else 'map-pb',
             subsample = f'-s {config["subsample_frac"]}' if config['subsample'] else '',
