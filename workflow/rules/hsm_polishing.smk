@@ -8,7 +8,7 @@ rule racon_paf:
     output:
         pafgz='results/{sample}/assemblies/racon/{assembly}.racon_{it}.paf.gz'
     conda:
-        '../envs/polishing.yaml'
+        '../envs/alignment.yaml'
     threads:
         workflow.cores
     params:
@@ -64,7 +64,7 @@ checkpoint medaka_init:
         results=directory('results/{sample}/assemblies/medaka/{assembly}/results'),
         polished=directory('results/{sample}/assemblies/medaka/{assembly}/polished'),
     conda:
-        '../envs/polishing.yaml'
+        '../envs/alignment.yaml'
     shell:
         """
         mkdir -p {output.ids} {output.contigs} {output.results} {output.polished} \
