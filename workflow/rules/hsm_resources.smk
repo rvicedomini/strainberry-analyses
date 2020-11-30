@@ -30,8 +30,8 @@ rule hsm_dl_references:
     shell:
         """
         mkdir -p resources/hsm/references \
-          && esearch -db nucleotide -query "NZ_AEDR01000001.1:NZ_AEDR01000063.1[PACC]" | efetch -format fasta > resources/references/NZ_AEDR00000000.1.fasta \
-          && esearch -db nucleotide -query "NZ_AEDS01000001.1:NZ_AEDS01000070.1[PACC]" | efetch -format fasta > resources/references/NZ_AEDS00000000.1.fasta
+          && (esearch -db nucleotide -query "NZ_AEDR01000001.1:NZ_AEDR01000063.1[PACC]" | efetch -format fasta > resources/references/NZ_AEDR00000000.1.fasta) \
+          && (esearch -db nucleotide -query "NZ_AEDS01000001.1:NZ_AEDS01000070.1[PACC]" | efetch -format fasta > resources/references/NZ_AEDS00000000.1.fasta)
         """
 
 rule hsm_reflist:
@@ -43,8 +43,8 @@ rule hsm_reflist:
     shell:
         """
         : > {output[0]} \
-          && printf "%s,%s\\n" "Vatypica-ACS-049-V-Sch6" "$(readlink -f resources/hsm/references/NZ_AEDR00000000.1.fasta)"  | tee --append {output[0]} >/dev/null
-          && printf "%s,%s\\n" "Vatypica-ACS-134-V-Col7a" "$(readlink -f resources/hsm/references/NZ_AEDS00000000.1.fasta)" | tee --append {output[0]} >/dev/null
+          && (printf "%s,%s\\n" "Vatypica-ACS-049-V-Sch6" "$(readlink -f resources/hsm/references/NZ_AEDR00000000.1.fasta)"  | tee --append {output[0]} >/dev/null) \
+          && (printf "%s,%s\\n" "Vatypica-ACS-134-V-Col7a" "$(readlink -f resources/hsm/references/NZ_AEDS00000000.1.fasta)" | tee --append {output[0]} >/dev/null)
         """
 
 if config['download_kraken2_db']:

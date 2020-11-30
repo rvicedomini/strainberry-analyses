@@ -44,13 +44,14 @@ rule all:
         f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_ctg.fa',
         f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_scf.fa',
         # strainberry polished contig assembly
+        f'results/{sample}/assemblies/medaka/sberry_lathe-p1_n{nstrains}_ctg/contigs',
         f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_ctg.medaka.fa',
         # kraken2 classification of contigs
         f'results/{sample}/kraken2/lathe-p1.kraken2',
-        f'results/{sample}/kraken2/sberry_lathe-p1_n{nstrains}_ctg.medaka.kraken2',
+#        f'results/{sample}/kraken2/sberry_lathe-p1_n{nstrains}_ctg.medaka.kraken2',
         # binning
         f'results/{sample}/binning/lathe-p1.depth.txt',
-        f'results/{sample}/binning/sberry_lathe-p1_n{nstrains}_ctg.medaka.depth.txt',
+#        f'results/{sample}/binning/sberry_lathe-p1_n{nstrains}_ctg.medaka.depth.txt',
         # TODO best bins
         #f'results/{sample}/assembly_eval/lathe-p1.best.tsv',
         #f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.best.tsv',
