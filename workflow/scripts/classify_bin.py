@@ -14,7 +14,7 @@ def main( argv = None ):
     parser = argparse.ArgumentParser()
     parser.add_argument('-i','--kraken', dest='krakenFile', required=True, help='output of kraken2')
     parser.add_argument('-s','--seq2bin', dest='seq2binFile', required=True, help='sequence-bin mapping')
-    parser.add_argument('-p','--prefix', dest='prefix', default="out", help='prefix of output files')
+    parser.add_argument('-o','--output', dest='outFile', required=True, help='output file')
     opt = parser.parse_args()
 
     # VALIDATE PARAMETERS
@@ -32,7 +32,7 @@ def main( argv = None ):
     with open(opt.seq2binFile,'r') as f:
         for line in f:
             seqid,binid=line.strip().split('\t')
-            bin2seq[binid].append(bin2seq)
+            bin2seq[binid].append(seqid)
 
     seqSpecies={}
     seqLength={}
@@ -41,20 +41,20 @@ def main( argv = None ):
             line=line.strip()
             if not line or line.startswith('#'):
                 continue
-            seqid,species,seqlen=line.split('\t')
+            _,seqid,species,seqlen,_=line.split('\t')
             species='_'.join( species.split('(taxid',1)[0].split() )
             seqSpecies[seqid]=species
             seqLength[seqid]=int(seqlen)
 
-    with open(f'{opt.prefix}.class.tsv','w') as out:
+    with open(f'{opt.outFile}','w') as out:
         header=['#bin_id','bin_nseq','bin_length','species','species_nseq','species_length','species_frac']
         out.write('\t'.join(header)+'\n')
         for binid,seqlst in bin2seq.items():
-            binLength=sum(seqLength[seqid] for seqid in bin2seq[binid])
+            binLength=sum(seqLength[seqid] for seqid in seqlst)
             seqCount=len(bin2seq[binid])
             speciesLength=defaultdict(int)
             speciesSeqCount=defaultdict(int)
-            for seqid in bin2seq[binid]:
+            for seqid in seqlst:
                 species=seqSpecies[seqid]
                 speciesLength[species]+=seqLength[seqid]
                 speciesSeqCount[species]+=1

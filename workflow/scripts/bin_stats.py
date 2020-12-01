@@ -46,7 +46,7 @@ def main( argv = None ):
                 continue
             cols=line.strip().split('\t')
             seqLength[cols[0]]=float(cols[1])
-            seqLength[cols[0]]=float(cols[2])
+            seqDepth[cols[0]]=float(cols[2])
 
     binSeqs=defaultdict(list)
     with open(opt.seq2bin,'r') as f:
@@ -59,8 +59,8 @@ def main( argv = None ):
 
     binDepth={}
     for binid,seqlist in binSeqs.items():
-        totlen=sum(seqLength[seqid] for seqid in seqlist)
-        w_sum=sum(seqDepth[seqid]*seqLength[seqid] for seqid in seqlist)
+        totlen=sum(seqLength[seqid] for seqid in seqlist if seqid in seqLength)
+        w_sum=sum(seqDepth[seqid]*seqLength[seqid] for seqid in seqlist if seqid in seqLength)
         binDepth[binid]=w_sum/totlen
 
     checkmStats={}
@@ -71,7 +71,7 @@ def main( argv = None ):
                 has_header=False
                 continue
             cols=line.split('\t')
-            checkmStats[cols[0]] = (float(x) for x in cols[-3:])
+            checkmStats[cols[0]] = list(map(float,cols[-3:]))
 
     binStats=[]
     with open(opt.classFile,'r') as classFile:
@@ -81,10 +81,10 @@ def main( argv = None ):
                 continue
             cols=line.split('\t')
             binid=cols[0]
-            compl,contam,sh=checkmEval[binid]
+            compl,contam,sh=checkmStats[binid]
             binqual=compl-5*contam
             bindepth=binDepth[binid]
-            if opt.keepBest and binqual < 70:
+            if not opt.keepBest or binqual >= 70:
                 cols += [ f'{compl:.2f}',f'{contam:.2f}',f'{sh:.2f}',f'{bindepth:.2f}' ]
                 binStats.append(cols)
     

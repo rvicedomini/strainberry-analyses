@@ -14,21 +14,6 @@ snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
 sample = config['sample']
 nstrains = int(config['nstrains'])
 
-#def hsm_plots(sample):
-#    plot_files = []
-#    if nstrains == 2:
-#        plot_files = [
-#            f'results/{sample}/assembly_eval/refcoverage_Sthermophilus_NWC_2_1-flye.svg',
-#            f'results/{sample}/assembly_eval/refcoverage_Ldelbrueckii_NWC_2_2-flye.svg',
-#            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_3-flye.svg',
-#            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_4-flye.svg',
-#            f'results/{sample}/assembly_eval/refcoverage_Sthermophilus_NWC_2_1-canu.svg',
-#            f'results/{sample}/assembly_eval/refcoverage_Ldelbrueckii_NWC_2_2-canu.svg',
-#            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_3-canu.svg',
-#            f'results/{sample}/assembly_eval/refcoverage_Lhelveticus_NWC_2_4-canu.svg',
-#        ]
-#    return plot_files
-
 
 rule all:
     input:
@@ -48,16 +33,15 @@ rule all:
         f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_ctg.medaka.fa',
         # kraken2 classification of contigs
         f'results/{sample}/kraken2/lathe-p1.kraken2',
-#        f'results/{sample}/kraken2/sberry_lathe-p1_n{nstrains}_ctg.medaka.kraken2',
+        f'results/{sample}/kraken2/sberry_lathe-p1_n{nstrains}_ctg.medaka.kraken2',
         # binning
         f'results/{sample}/binning/lathe-p1.depth.txt',
-#        f'results/{sample}/binning/sberry_lathe-p1_n{nstrains}_ctg.medaka.depth.txt',
-        # TODO best bins
-        #f'results/{sample}/assembly_eval/lathe-p1.best.tsv',
-        #f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.best.tsv',
-        #f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.polished.best.tsv',
-        # TODO pre/post separation plot
-        #f'results/{sample}/assembly_eval/sberry_lathe-p1_n{nstrains}_ctg.barplot.pdf',
+        f'results/{sample}/binning/sberry_lathe-p1_n{nstrains}_ctg.medaka.depth.txt',
+        # best bins
+        f'results/{sample}/evaluation/lathe-p1.bin_stats.tsv',
+        f'results/{sample}/evaluation/sberry_lathe-p1_n{nstrains}_ctg.medaka.bin_stats.tsv',
+        # pre/post separation plot
+        f'results/{sample}/evaluation/sberry_lathe-p1_n{nstrains}_ctg.barplot.svg',
 
 
 

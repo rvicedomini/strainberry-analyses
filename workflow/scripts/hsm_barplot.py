@@ -23,11 +23,7 @@ def subtitle_decorator(handler):
     return wrapper
 
 
-def plot_clustered_stacked(dfall, binNames, preBinStats, postBinStats, str2col, labels=None, title=r"\textbf{Kraken2 classification pre/post bin separation}"):
-    """Given a list of dataframes, with identical columns and index, create a clustered stacked bar plot. 
-labels is a list of the names of the dataframe, used for the legend
-title is a string for the title of the plot
-H is the hatch used for identification of the different dataframe"""
+def plot_clustered_stacked(dfall, binNames, preBinStats, postBinStats, str2col, labels=None, title="Assembly size and classification before/after Strainberry separation"):
 
     #rc('text', usetex=True)
 
@@ -74,9 +70,10 @@ H is the hatch used for identification of the different dataframe"""
     for binid in df.index:
         binCompl=postBinStats[binid]['completeness']
         binCoverage=preBinStats[binid]['coverage']
-        binLabel=r'{name} ({coverage}$\times$)'.format(name=' '.join(binNames[binid][0:2]),coverage=int(binCoverage))
-        bin_xlab=r'\textbf{{{name}}}'.format(name=binLabel) if binCompl>=70 else binLabel
-        bin_xlab=r'\color{{red}} {name}'.format(name=bin_xlab) if binCoverage<35 else bin_xlab
+        bin_xlab=r'{name} ({coverage}X)'.format(name=' '.join(binNames[binid][0:2]),coverage=int(binCoverage))
+        #binLabel=r'{name} ({coverage}X)'.format(name=' '.join(binNames[binid][0:2]),coverage=int(binCoverage))
+        #bin_xlab=r'\textbf{{{name}}}'.format(name=binLabel) if binCompl>=70 else binLabel
+        #bin_xlab=r'\color{{red}} {name}'.format(name=bin_xlab) if binCoverage<35 else bin_xlab
         xlabels.append(bin_xlab)
 
     #xlabels=[ binNames[binid] for binid in df.index ]
@@ -99,7 +96,7 @@ H is the hatch used for identification of the different dataframe"""
     subtitles=[]
     for binid in df.index:
         #binLabel=r"\textbf{{ {spName} ({binCov}$\times$) }}".format(spName=binNames[binid],binCov=int(binStats[binid]['coverage']))
-        binLabel=r"\textbf{{ {spName} }}".format(spName=' '.join(binNames[binid][0:2]))
+        binLabel=r"{spName}".format(spName=' '.join(binNames[binid][0:2]))
         subtitles.append( mpatches.Patch(label=binLabel, alpha=0) )
         for species in df.columns:
             if any( dfall[i].loc[binid][species] for i in range(n_df) ):
@@ -119,12 +116,15 @@ H is the hatch used for identification of the different dataframe"""
     #axe.add_artist(l1)
     return fig,axe
 
-def load_tsv(fname):
+def load_tsv(fname,has_header=False):
     bin2sp=defaultdict(lambda:defaultdict(int))
     binStats=defaultdict(lambda:defaultdict(float))
     spSet=set()
     with open(fname,'r') as preFile:
         for line in preFile:
+            if has_header:
+                has_header=False
+                continue
             cols=line.rstrip().split('\t')
             binId=cols[0]
             binSize=int(cols[2])
@@ -146,11 +146,11 @@ def main( argv = None ):
     parser = argparse.ArgumentParser()
     parser.add_argument('--pre', dest='preFile', required=True, help='TSV file of stats for the pre-separation bins')
     parser.add_argument('--sep', dest='sepFile', required=True, help='TSV file of stats for the post-separation bins')
-    parser.add_argument('-p','--prefix', dest='prefix', required=True, help='output file prefix')
+    parser.add_argument('--output', dest='outFile', required=True, help='output file in svg format')
     opt = parser.parse_args()
 
-    preStats,preSpSet,preBinStats=load_tsv(opt.preFile)
-    sepStats,sepSpSet,sepBinStats=load_tsv(opt.sepFile)
+    preStats,preSpSet,preBinStats=load_tsv(opt.preFile,has_header=True)
+    sepStats,sepSpSet,sepBinStats=load_tsv(opt.sepFile,has_header=True)
 
     binList=list(preStats.keys())
     binNames=dict( (binid, max(preStats[binid].items(), key=operator.itemgetter(1))[0].split('_')) for binid in preStats.keys() )
@@ -173,14 +173,10 @@ def main( argv = None ):
 
     #plt.style.use('seaborn')
     tex_fonts = {
-            'figure.figsize' : [23,13],
-            'font.family' : 'sans-serif',
-            'font.size' : 20,
-            'legend.fontsize': 13,
-            'text.usetex' : True,
-            'text.latex.preamble': [
-                r'\usepackage{xcolor}'
-            ]
+        'figure.figsize' : [23,13],
+        'font.family' : 'sans-serif',
+        'font.size' : 18,
+        'legend.fontsize': 12,
     }
     plt.rcParams.update(tex_fonts)
 
@@ -193,7 +189,7 @@ def main( argv = None ):
     
     plt.subplots_adjust(bottom=0.27,left=0.1,right=0.8,top=0.93)
     plt.xticks(rotation=50, ha='right')
-    plt.savefig(f'{opt.prefix}.barplot.svg')
+    plt.savefig(f'{opt.outFile}')
     #plt.tight_layout()
     #plt.show()
 
