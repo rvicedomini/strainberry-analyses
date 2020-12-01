@@ -146,7 +146,7 @@ def main( argv = None ):
     parser = argparse.ArgumentParser()
     parser.add_argument('--pre', dest='preFile', required=True, help='TSV file of stats for the pre-separation bins')
     parser.add_argument('--sep', dest='sepFile', required=True, help='TSV file of stats for the post-separation bins')
-    parser.add_argument('--output', dest='outFile', required=True, help='output file in svg format')
+    parser.add_argument('--prefix', dest='prefix', required=True, help='output file prefix')
     opt = parser.parse_args()
 
     preStats,preSpSet,preBinStats=load_tsv(opt.preFile,has_header=True)
@@ -189,7 +189,8 @@ def main( argv = None ):
     
     plt.subplots_adjust(bottom=0.27,left=0.1,right=0.8,top=0.93)
     plt.xticks(rotation=50, ha='right')
-    plt.savefig(f'{opt.outFile}')
+    plt.savefig(f'{opt.prefix}.pdf')
+    plt.savefig(f'{opt.prefix}.svg')
     #plt.tight_layout()
     #plt.show()
 

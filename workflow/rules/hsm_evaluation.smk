@@ -122,11 +122,12 @@ rule hsm_barplot:
         lathe='results/hsm/evaluation/lathe-p1.bin_stats.tsv',
         sberry='results/hsm/evaluation/sberry_lathe-p1_n2_ctg.medaka.bin_stats.tsv',
     output:
-        barplot='results/hsm/evaluation/sberry_lathe-p1_n2_ctg.barplot.svg',
+        'results/hsm/evaluation/sberry_lathe-p1_n2_ctg.barplot.pdf',
+        'results/hsm/evaluation/sberry_lathe-p1_n2_ctg.barplot.svg',
     conda:
         "../envs/assembly_eval.yaml"
     shell:
         """
-        python3 workflow/scripts/hsm_barplot.py --pre {input.lathe} --sep {input.sberry} --output {output.barplot}
+        python3 workflow/scripts/hsm_barplot.py --pre {input.lathe} --sep {input.sberry} --prefix results/hsm/evaluation/sberry_lathe-p1_n2_ctg.barplot
         """
 

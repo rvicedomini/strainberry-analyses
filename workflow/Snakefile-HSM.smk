@@ -41,6 +41,7 @@ rule all:
         f'results/{sample}/evaluation/lathe-p1.bin_stats.tsv',
         f'results/{sample}/evaluation/sberry_lathe-p1_n{nstrains}_ctg.medaka.bin_stats.tsv',
         # pre/post separation plot
+        f'results/{sample}/evaluation/sberry_lathe-p1_n{nstrains}_ctg.barplot.pdf',
         f'results/{sample}/evaluation/sberry_lathe-p1_n{nstrains}_ctg.barplot.svg',
 
 
