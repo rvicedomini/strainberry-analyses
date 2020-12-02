@@ -6,7 +6,7 @@ rule hsm_kraken2:
         kreport='results/{sample}/kraken2/{assembly}.kreport',
         kraken2='results/{sample}/kraken2/{assembly}.kraken2',
     conda:
-        '../envs/assembly_eval.yaml',
+        '../envs/evaluation.yaml',
     threads:
         workflow.cores
     params:
@@ -29,7 +29,7 @@ rule hsm_lathe_binning:
     log:
         'logs/hsm/lathe-p1_binning.log'
     conda:
-        "../envs/assembly_eval.yaml"
+        "../envs/evaluation.yaml"
     threads:
         workflow.cores
     shell:
@@ -55,7 +55,7 @@ rule hsm_sberry_binning:
     log:
         'logs/hsm/sberry_lathe-p1_n2_ctg.medaka_binning.log'
     conda:
-        "../envs/assembly_eval.yaml"
+        "../envs/evaluation.yaml"
     threads:
         workflow.cores
     shell:
@@ -74,7 +74,7 @@ rule hsm_checkm_eval:
     log:
         'logs/{sample}/{assembly}_checkm.log'
     conda:
-        "../envs/assembly_eval.yaml"
+        "../envs/evaluation.yaml"
     threads:
         workflow.cores
     shell:
@@ -90,7 +90,7 @@ rule hsm_classify_bins:
     output:
         classif='results/{sample}/binning/{assembly}.class.tsv'
     conda:
-        "../envs/assembly_eval.yaml"
+        "../envs/evaluation.yaml"
     shell:
         """
         python3 workflow/scripts/classify_bin.py --kraken {input.kraken2} --seq2bin {input.seq2bin} -o {output.classif} \
@@ -108,7 +108,7 @@ rule hsm_bin_stats:
     params:
         keep_best_only = lambda w: '--keep-best-only' if w.assembly=='lathe-p1' else ''
     conda:
-        "../envs/assembly_eval.yaml"
+        "../envs/evaluation.yaml"
     shell:
         """
         mkdir -p results/{wildcards.sample}/evaluation \
@@ -122,12 +122,65 @@ rule hsm_barplot:
         lathe='results/hsm/evaluation/lathe-p1.bin_stats.tsv',
         sberry='results/hsm/evaluation/sberry_lathe-p1_n2_ctg.medaka.bin_stats.tsv',
     output:
-        'results/hsm/evaluation/sberry_lathe-p1_n2_ctg.barplot.pdf',
-        'results/hsm/evaluation/sberry_lathe-p1_n2_ctg.barplot.svg',
+        'results/hsm/evaluation/sberry_lathe-p1.barplot.pdf',
+        'results/hsm/evaluation/sberry_lathe-p1.barplot.svg',
     conda:
-        "../envs/assembly_eval.yaml"
+        "../envs/evaluation.yaml"
     shell:
         """
-        python3 workflow/scripts/hsm_barplot.py --pre {input.lathe} --sep {input.sberry} --prefix results/hsm/evaluation/sberry_lathe-p1_n2_ctg.barplot
+        python3 workflow/scripts/hsm_barplot.py --pre {input.lathe} --sep {input.sberry} --prefix results/hsm/evaluation/sberry_lathe-p1.barplot
         """
+
+rule hsm_vatypica:
+    input:
+        lathe_binstats='results/hsm/evaluation/lathe-p1.bin_stats.tsv',
+        lathe_seq2bin='results/hsm/binning/lathe-p1.bins.tsv',
+        lathe_depth='results/hsm/binning/lathe-p1.depth.txt',
+        sberry_seq2bin='results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka.bins.tsv',
+        sberry_depth='results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka.depth.txt',
+    output:
+        outdir=directory('results/hsm/vatypica'),
+        plot='results/hsm/evaluation/sberry_lathe-p1.vatypica.depth.pdf'
+    conda:
+        "../envs/evaluation.yaml"
+    shell:
+        """
+        mkdir -p {output.outdir}
+        vatypica_bin="$(fgrep -m1 'Veillonella_atypica' {input.lathe_binstats} | awk '{{print $1;exit}}')"
+
+        awk -v binid="${{vatypica_bin}}" '$2==binid{{print $1}}' {input.lathe_seq2bin} > {output.outdir}/lathe-p1.vatypica.list
+        awk 'BEGIN{{OFS="\\t"}} FNR==NR{{seq[$1]++;next}} ($1 in seq){{print $1,$2,$3}}' {output.outdir}/lathe-p1.vatypica.list {input.lathe_depth} >{output.outdir}/lathe-p1.vatypica.depth.tsv
+
+        awk -v binid="${{vatypica_bin}}" '$2==binid{{print $1}}' {input.sberry_seq2bin} > {output.outdir}/sberry_lathe-p1.vatypica.list
+        awk 'BEGIN{{OFS="\\t"}} FNR==NR{{seq[$1]++;next}} ($1 in seq){{print $1,$2,$3}}' {output.outdir}/sberry_lathe-p1.vatypica.list {input.sberry_depth} >{output.outdir}/sberry_lathe-p1.vatypica.depth.tsv
+
+        python3 workflow/scripts/plot_coverage_diff.py --before {output.outdir}/lathe-p1.vatypica.depth.tsv --after {output.outdir}/sberry_lathe-p1.vatypica.depth.tsv --prefix results/hsm/evaluation/sberry_lathe-p1.vatypica.depth
+        """
+
+rule hsm_eeligens:
+    input:
+        lathe_binstats='results/hsm/evaluation/lathe-p1.bin_stats.tsv',
+        lathe_seq2bin='results/hsm/binning/lathe-p1.bins.tsv',
+        lathe_depth='results/hsm/binning/lathe-p1.depth.txt',
+        sberry_seq2bin='results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka.bins.tsv',
+        sberry_depth='results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka.depth.txt',
+    output:
+        outdir=directory('results/hsm/eeligens'),
+        plot='results/hsm/evaluation/sberry_lathe-p1.eeligens.depth.pdf'
+    conda:
+        "../envs/evaluation.yaml"
+    shell:
+        """
+        mkdir -p {output.outdir}
+        eeligens_bin="$(fgrep -m1 '[Eubacterium]_eligens' {input.lathe_binstats} | awk '{{print $1;exit}}')"
+
+        awk -v binid="${{eeligens_bin}}" '$2==binid{{print $1}}' {input.lathe_seq2bin} > {output.outdir}/lathe-p1.eeligens.list
+        awk 'BEGIN{{OFS="\\t"}} FNR==NR{{seq[$1]++;next}} ($1 in seq){{print $1,$2,$3}}' {output.outdir}/lathe-p1.eeligens.list {input.lathe_depth} >{output.outdir}/lathe-p1.eeligens.depth.tsv
+
+        awk -v binid="${{eeligens_bin}}" '$2==binid{{print $1}}' {input.sberry_seq2bin} > {output.outdir}/sberry_lathe-p1.eeligens.list
+        awk 'BEGIN{{OFS="\\t"}} FNR==NR{{seq[$1]++;next}} ($1 in seq){{print $1,$2,$3}}' {output.outdir}/sberry_lathe-p1.eeligens.list {input.sberry_depth} >{output.outdir}/sberry_lathe-p1.eeligens.depth.tsv
+
+        python3 workflow/scripts/plot_coverage_diff.py --before {output.outdir}/lathe-p1.eeligens.depth.tsv --after {output.outdir}/sberry_lathe-p1.eeligens.depth.tsv --prefix results/hsm/evaluation/sberry_lathe-p1.eeligens.depth
+        """
+
 

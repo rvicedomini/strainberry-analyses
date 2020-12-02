@@ -10,7 +10,7 @@ import os, glob, snakemake
 # Rules requiring internet connection
 localrules: hsm_dl_reads, hsm_dl_assembly, hsm_dl_references
 
-snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
+#snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
 sample = config['sample']
 nstrains = int(config['nstrains'])
 
@@ -40,9 +40,12 @@ rule all:
         # best bins
         f'results/{sample}/evaluation/lathe-p1.bin_stats.tsv',
         f'results/{sample}/evaluation/sberry_lathe-p1_n{nstrains}_ctg.medaka.bin_stats.tsv',
+        # vatypica/ plots
+        f'results/{sample}/evaluation/sberry_lathe-p1.vatypica.depth.pdf',
+        f'results/{sample}/evaluation/sberry_lathe-p1.eeligens.depth.pdf',
         # pre/post separation plot
-        f'results/{sample}/evaluation/sberry_lathe-p1_n{nstrains}_ctg.barplot.pdf',
-        f'results/{sample}/evaluation/sberry_lathe-p1_n{nstrains}_ctg.barplot.svg',
+        f'results/{sample}/evaluation/sberry_lathe-p1.barplot.pdf',
+        f'results/{sample}/evaluation/sberry_lathe-p1.barplot.svg',
 
 
 
@@ -62,9 +65,7 @@ include: "rules/strainberry.smk"
 # Polishing
 include: 'rules/hsm_polishing.smk'
 
-# Evaluation rules of generated assemblies (classification, binning, etc.)
+# Classification, binning, evaluation, plots
 include: "rules/hsm_evaluation.smk"
 
-# Specific plots for HSM
-#include: "rules/hsm_plots.smk"
 

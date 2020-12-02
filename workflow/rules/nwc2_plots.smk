@@ -1,7 +1,7 @@
 
 rule nwc2_assembly_align:
     input:
-        asm='results/{sample}/assembly_eval/{assembly}/assembly.{refname}.fa',
+        asm='results/{sample}/evaluation/{assembly}/assembly.{refname}.fa',
         ref_csv=config['ref_csv'],
     output:
         bam='results/{sample}/alignments/{assembly}-{refname}.bam'
@@ -34,23 +34,23 @@ rule nwc2_refcoverage_plot:
         bam2='results/{sample}/alignments/sberry_{assembly}_n2_scf-{refname}.bam',
         bai2='results/{sample}/alignments/sberry_{assembly}_n2_scf-{refname}.bam.bai',
     output:
-        bedgz1='results/{sample}/assembly_eval/mosdepth/{assembly}-{refname}.regions.bed.gz',
-        bedgz2='results/{sample}/assembly_eval/mosdepth/sberry_{assembly}_n2_scf-{refname}.regions.bed.gz',
-        svg='results/{sample}/assembly_eval/refcoverage_{refname}-{assembly}.svg'
+        bedgz1='results/{sample}/evaluation/mosdepth/{assembly}-{refname}.regions.bed.gz',
+        bedgz2='results/{sample}/evaluation/mosdepth/sberry_{assembly}_n2_scf-{refname}.regions.bed.gz',
+        svg='results/{sample}/evaluation/refcoverage_{refname}-{assembly}.svg'
     log:
         'logs/{sample}/refcoverage_{refname}-{assembly}.log'
     conda:
-        '../envs/assembly_eval.yaml'
+        '../envs/evaluation.yaml'
     threads:
         workflow.cores
     params:
         maxcov=nwc2_maxcov
     shell:
         """
-        mkdir -p results/{wildcards.sample}/assembly_eval/mosdepth \
-          && mosdepth -t {threads} --by 20000 -m -x results/{wildcards.sample}/assembly_eval/mosdepth/{wildcards.assembly}-{wildcards.refname} {input.bam1} >{log} \
-          && mosdepth -t {threads} --by 20000 -m -x results/{wildcards.sample}/assembly_eval/mosdepth/sberry_{wildcards.assembly}_n2_scf-{wildcards.refname} {input.bam2} >{log} \
+        mkdir -p results/{wildcards.sample}/evaluation/mosdepth \
+          && mosdepth -t {threads} --by 20000 -m -x results/{wildcards.sample}/evaluation/mosdepth/{wildcards.assembly}-{wildcards.refname} {input.bam1} >{log} \
+          && mosdepth -t {threads} --by 20000 -m -x results/{wildcards.sample}/evaluation/mosdepth/sberry_{wildcards.assembly}_n2_scf-{wildcards.refname} {input.bam2} >{log} \
           && python3 workflow/scripts/assembly_refcoverage.py -m {params.maxcov} -b {output.bedgz1} {output.bedgz2} \
-               -p results/{wildcards.sample}/assembly_eval/refcoverage_{wildcards.refname}-{wildcards.assembly} >>{log}
+               -p results/{wildcards.sample}/evaluation/refcoverage_{wildcards.refname}-{wildcards.assembly} >>{log}
         """
 

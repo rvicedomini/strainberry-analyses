@@ -20,11 +20,6 @@ rule flye_assembly:
           && cp results/{wildcards.sample}/assemblies/flye/assembly.fasta {output[0]}
         """
 
-#rule flye_assembly_link:
-#    input:  rules.flye_assembly.output[0]
-#    output: 'results/{sample}/assemblies/flye.fa'
-#    shell:  'ln -s $(readlink -f {input}) {output}'
-
 rule canu_assembly:
     input: 
         reads=expand('{basepath}/{filename}', basepath=config['read_basepath'], filename=config['read_filenames'])
@@ -45,9 +40,4 @@ rule canu_assembly:
         canu -p assembly -d results/{wildcards.sample}/assemblies/canu/ genomeSize={params.mgsize} maxThreads={threads} useGrid=false {params.readtype} {input.reads} &>{log} \
           && cp results/{wildcards.sample}/assemblies/canu/assembly.contigs.fasta {output[0]}
         """
-
-#rule canu_assembly_link:
-#    input:  rules.canu_assembly.output[0]
-#    output: 'results/{sample}/assemblies/canu.fa'
-#    shell:  'ln -s $(readlink -f {input}) {output}'
 
