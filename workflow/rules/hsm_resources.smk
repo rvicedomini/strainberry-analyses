@@ -1,6 +1,3 @@
-###################
-### HSM DATASET ###
-###################
 
 rule hsm_dl_reads:
     input:  ancient("config/hsm.yaml")

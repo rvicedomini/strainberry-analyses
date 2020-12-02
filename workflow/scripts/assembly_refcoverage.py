@@ -46,7 +46,6 @@ def main( argv = None ):
     ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x,y:f'{x/1000000:.1f}'))
     
     ax.set_yticks(np.array([1,2,3]))
-    #ax.yaxis.set_major_locator(plt.MultipleLocator(1))
     ax.set_ylim([None,opt.maxCov])
     
     ax.margins(x=0)
@@ -68,14 +67,11 @@ def main( argv = None ):
         ylst.append(np.array(ytmp))
         clst.append(colors[i])
  
-    #plt.plot(x,y,color=colors[i])
-    #plt.fill_between(x,y,alpha=0.5)
-    ax.plot(xarr,ylst[0],color='black') #clst[0])
-    ax.plot(xarr,ylst[1],color='black') #clst[1])
+    ax.plot(xarr,ylst[0],color='black')
+    ax.plot(xarr,ylst[1],color='black')
     ax.fill_between(xarr, ylst[0], ylst[1], where=(ylst[0] > ylst[1]), color=clst[0], alpha=0.5, interpolate=True)
     ax.fill_between(xarr, ylst[0], ylst[1], where=(ylst[0] <= ylst[1]), color=clst[1], alpha=0.5, interpolate=True)
     ax.fill_between(xarr, np.minimum(ylst[0],ylst[1]), 0, color='grey', alpha=0.5, interpolate=True)
-
 
     # Plot axes labels and show the plot
     plt.tight_layout()
@@ -83,9 +79,9 @@ def main( argv = None ):
     plt.xlabel('Reference sequence (Mbp)',labelpad=30)
     plt.ylabel('Coverage',labelpad=30)
     plt.savefig(f'{opt.prefix}.svg')
-    #plt.show()
+
+    return 0
 
 
-# Check if the program is not being imported
 if __name__ == "__main__":
     sys.exit(main())

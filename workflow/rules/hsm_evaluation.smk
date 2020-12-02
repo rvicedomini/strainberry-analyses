@@ -40,8 +40,9 @@ rule hsm_lathe_binning:
           && python3 workflow/scripts/seq2bin.py -i {output.bins} -x fa -o {output.seq2bin} 2>>{log}
         """
 
-# strainberry bins are not created with metabat2
-# instead they correspond to lathe bins but with separated sequences
+# Strainberry bins are not created with metabat2
+# In order to compare species/strain assemblies before/after the separation,
+# Strainberry bins generated with the separated sequences of each Lathe bin
 rule hsm_sberry_binning:
     input:
         sberry_fasta='results/hsm/assemblies/sberry_lathe-p1_n2_ctg.medaka.fa',

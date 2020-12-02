@@ -9,7 +9,7 @@ rule flye_assembly:
     conda:   
         '../envs/assembly.yaml'
     threads:
-        12 #workflow.cores
+        workflow.cores
     params:
         readtype = '--nano-raw' if config['technology'] == 'nanopore' else '--pacbio-raw',
         mgsize = config['mg_size']
@@ -19,11 +19,6 @@ rule flye_assembly:
           && flye --meta --min-overlap 3000 --iterations 4 --genome-size {params.mgsize} --out-dir results/{wildcards.sample}/assemblies/flye --threads {threads} {params.readtype} {input.reads} &>{log} \
           && cp results/{wildcards.sample}/assemblies/flye/assembly.fasta {output[0]}
         """
-
-#rule flye_assembly_link:
-#    input:  rules.flye_assembly.output[0]
-#    output: 'results/{sample}/assemblies/flye.fa'
-#    shell:  'ln -s $(readlink -f {input}) {output}'
 
 rule canu_assembly:
     input: 
@@ -35,7 +30,7 @@ rule canu_assembly:
     conda:   
         '../envs/assembly.yaml'
     threads:
-        12 #workflow.cores
+        workflow.cores
     params:
         readtype = '-nanopore' if config['technology'] == 'nanopore' else '-pacbio',
         mgsize = config['mg_size'],
@@ -45,9 +40,4 @@ rule canu_assembly:
         canu -p assembly -d results/{wildcards.sample}/assemblies/canu/ genomeSize={params.mgsize} maxThreads={threads} useGrid=false {params.readtype} {input.reads} &>{log} \
           && cp results/{wildcards.sample}/assemblies/canu/assembly.contigs.fasta {output[0]}
         """
-
-#rule canu_assembly_link:
-#    input:  rules.canu_assembly.output[0]
-#    output: 'results/{sample}/assemblies/canu.fa'
-#    shell:  'ln -s $(readlink -f {input}) {output}'
 

@@ -47,7 +47,7 @@ def main( argv = None ):
             seqLength[seqid]=int(seqlen)
 
     with open(f'{opt.outFile}','w') as out:
-        header=['#bin_id','bin_nseq','bin_length','species','species_nseq','species_length','species_frac']
+        header=['#bin_id','bin_nseq','bin_size','strain','strain_nseq','strain_size','strain_frac']
         out.write('\t'.join(header)+'\n')
         for binid,seqlst in bin2seq.items():
             binLength=sum(seqLength[seqid] for seqid in seqlst)
@@ -69,7 +69,6 @@ def main( argv = None ):
     return 0
 
 
-# Check if the program is not being imported
 if __name__ == "__main__":
     sys.exit(main())
 

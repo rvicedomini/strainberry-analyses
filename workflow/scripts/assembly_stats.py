@@ -252,6 +252,5 @@ def main( argv = None ):
     return 0
 
 
-# Check if the program is not being imported
 if __name__ == "__main__":
     sys.exit(main())

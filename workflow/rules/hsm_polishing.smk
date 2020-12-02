@@ -1,6 +1,3 @@
-# the following should not be necessary
-#ruleorder: racon_init > racon_consensus
-
 rule racon_paf:
     input:
         reads=expand('{basepath}/{filename}', basepath=config['read_basepath'], filename=config['read_filenames']),
@@ -113,7 +110,6 @@ rule medaka_stitch:
     output: 'results/{sample}/assemblies/medaka/{assembly}/polished/{contig}.fa',
     conda:  '../envs/polishing.yaml'
     shell:  "medaka stitch '{input[0]}' '{output[0]}'"
-    #shell:  'medaka stitch {input[0]} {input[1]} {output}'
 
 def aggregate_medaka_results(wildcards):
     checkpoint_output = checkpoints.medaka_init.get(**wildcards).output.ids

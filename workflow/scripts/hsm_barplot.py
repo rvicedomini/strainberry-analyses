@@ -49,9 +49,6 @@ def plot_clustered_stacked(dfall, binNames, preBinStats, postBinStats, str2col, 
                       grid=False,
                       colormap="Set3")  # make bar plots
     
-    #color_lst=[plt.cm.Pastel1(i) for i in np.linspace(0, 1, 12)]
-    #print(f'color_lst: {color_lst}')
-    
     h,l = axe.get_legend_handles_labels() # get the handles we want to modify
     for i in range(0, n_df * n_col, n_col): # len(h) = n_col * n_df
         df=dfall[i//n_col]
@@ -160,7 +157,6 @@ def main( argv = None ):
 
     spList=sorted(list(preSpSet|sepSpSet))
     spList.append('others')
-    #spNames=list(map( lambda x:' '.join(x.split('_')),spList))
 
     strain2color=defaultdict(lambda:defaultdict(int))
     for bid in binList:
@@ -185,15 +181,16 @@ def main( argv = None ):
     ax.xaxis.set_tick_params(which=u'both',length=0)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    #ax.set_frame_on(False)
     
     plt.subplots_adjust(bottom=0.27,left=0.1,right=0.8,top=0.93)
     plt.xticks(rotation=50, ha='right')
     plt.savefig(f'{opt.prefix}.pdf')
     plt.savefig(f'{opt.prefix}.svg')
-    #plt.tight_layout()
     #plt.show()
 
-# Check if the program is not being imported
+    return 0
+
+
 if __name__ == "__main__":
     sys.exit(main())
+

@@ -94,7 +94,6 @@ def main( argv = None ):
     plt.xlabel('depth of coverage')
     plt.ylabel('contig length (Mbp)')
 
-    #plt.axis([0, 6, 0, 20])
     plt.savefig(f'{opt.prefix}.pdf')
 
     return 0

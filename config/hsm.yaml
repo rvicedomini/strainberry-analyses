@@ -27,6 +27,11 @@ subsample: False
 # Value of -s option of samtools view for downsampling (used only if 'subsample' is set to True)
 subsample_frac: 0.99
 
+# Kraken2 database can be independently retrieved at https://lomanlab.github.io/mockcommunity/mc_databases.html
+# and stored in a custom path. Otherwise, if 'download_kraken2_db' option is set to True, 
+# it will be automatically downloaded in the following path:
+# resources/maxikraken2_1903_140GB 
+# (assuming snakemake command is executed from the root directory as indicated in the README)
 download_kraken2_db: False
-kraken2_db: '/pasteur/projets/policy02/seqbio/riccardo/databases/maxikraken2_1903_140GB'  #'resources/maxikraken2_1903_140GB'
+kraken2_db: 'resources/maxikraken2_1903_140GB'
 

@@ -15,7 +15,8 @@ rule strainberry:
         'logs/{sample}/sberry_{assembly}.log'
     conda:
         "../envs/strainberry.yaml"
-    threads: 14
+    threads:
+        workflow.cores
     shell:
         """
         strainberry -r {input.fasta} -b {input.bam} -o results/{wildcards.sample}/assemblies/sberry_{wildcards.assembly}_n{params.nstrains} -n {params.nstrains} -t {threads} {params.tech} &>{log} \
