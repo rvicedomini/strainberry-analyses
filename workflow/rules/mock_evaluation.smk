@@ -4,7 +4,8 @@ rule assembly_stats:
         fasta="results/{sample}/assemblies/{assembly}.fa",
         references=config['ref_csv'],
     output:
-        "results/{sample}/evaluation/{assembly}.report.tsv"
+        directory('results/{sample}/evaluation/{assembly}'),
+        "results/{sample}/evaluation/{assembly}.report.tsv",
     log:
         'logs/{sample}/{assembly}_stats.log'
     conda:
@@ -13,7 +14,7 @@ rule assembly_stats:
         workflow.cores
     shell:
         """
-        python3 workflow/scripts/assembly_stats.py -f {input.fasta} -r {input.references} -o results/{sample}/evaluation/{wildcards.assembly} -t {threads} &>{log}
-        cp results/{sample}/evaluation/{wildcards.assembly}/report.tsv {output[0]}
+        python3 workflow/scripts/assembly_stats.py -f {input.fasta} -r {input.references} -o {output[0]} -t {threads} &>{log}
+        cp {output[0]}/report.tsv {output[1]}
         """
 

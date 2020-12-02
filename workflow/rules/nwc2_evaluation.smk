@@ -4,6 +4,7 @@ rule nwc2_assembly_stats:
         fasta="results/{sample}/assemblies/{assembly}.fa",
         references=config['ref_csv'],
     output:
+        directory('results/{sample}/evaluation/{assembly}'),
         "results/{sample}/evaluation/{assembly}.report.tsv",
         'results/{sample}/evaluation/{assembly}/assembly.Sthermophilus_NWC_2_1.fa',
         'results/{sample}/evaluation/{assembly}/assembly.Ldelbrueckii_NWC_2_2.fa',
@@ -17,8 +18,8 @@ rule nwc2_assembly_stats:
         workflow.cores
     shell:
         """
-        python3 workflow/scripts/assembly_stats.py -f {input.fasta} -r {input.references} -o results/{wildcards.sample}/evaluation/{wildcards.assembly} -t {threads} &>{log}
-        cp results/{wildcards.sample}/evaluation/{wildcards.assembly}/report.tsv {output[0]}
+        python3 workflow/scripts/assembly_stats.py -f {input.fasta} -r {input.references} -o {output[0]} -t {threads} &>{log}
+        cp {output[0]}/report.tsv {output[1]}
         """
 
 rule nwc2_checkm_bacteria:
@@ -29,7 +30,7 @@ rule nwc2_checkm_bacteria:
 
 rule nwc2_checkm_stats:
     input:
-        asmdir=directory('results/{sample}/evaluation/{assembly}'),
+        asmdir='results/{sample}/evaluation/{assembly}',
         asmrep='results/{sample}/evaluation/{assembly}.report.tsv',
         bacms='results/{sample}/evaluation/checkm/bacteria.ms',
     output:
