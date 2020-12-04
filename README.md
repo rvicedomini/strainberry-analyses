@@ -92,10 +92,8 @@ where `[dataset]` is either `mock3`, `mock9`, `nwc2_pacbio`, `nwc2_ont`, or `hsm
 
 ## Cluster execution
 
-The documentation for running snakemake in a cluster environment can be found at the following links:
+The documentation for running snakemake in a computing environment can be found at the following links:
 
 + [Cluster execution](https://snakemake.readthedocs.io/en/stable/executing/cluster.html)
 + [Snakemake Profiles](https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles)
-+ Publicly available profiles for varous computing environments can be found at <https://github.com/snakemake-profiles/doc>
-
 
