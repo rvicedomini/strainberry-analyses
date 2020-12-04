@@ -8,13 +8,14 @@
 
 ## System requirements
 
++ GNU bash (version 4+ recommended)
++ Standard development packages with a GCC version supporting C++11:
+    - Debian/Ubuntu: `build-essential` and `python3-dev`
+    - RedHat/CentOS/Fedora: `gcc`, `gcc-c++`, `glibc-devel`, `make`, and `python3-devel`
+
 Strainberry analysis scripts make use of Snakemake and have been tested under a Linux environment.
 They have been developed and tested using the following packages/tools (older versions might now work properly):
 
-+ GNU bash (version 4.1.2(2)-release)
-+ Standard development packages:
-    - Debian/Ubuntu: `build-essential` and `python3-dev`
-    - RedHat/CentOS/Fedora: `gcc`, `gcc-c++`, `glibc-devel`, `make`, and `python3-devel` (a GCC version supporting C++11 is required)
 + [miniconda3](https://conda.io/en/latest/miniconda.html) (Python 3.7)
 + [Snakemake](https://snakemake.readthedocs.io) (version 5.26.1)
 + [Strainberry](https://github.com/rvicedomini/strainberry) (version 1.0)
@@ -81,29 +82,20 @@ will run the main analysis workflow on Mock3, using at most 12 threads.
 
 ## Results
 
-Assemblies, evaluation files, and graphs are generated in the `results` in sub-directories that
-depend on the dataset processed.
+Assemblies, evaluation files, and graphs are generated in the `results` sub-directory in paths that
+depend on the dataset processed (see [Usage](#usage)).
 
-### Mock3
++ Assemblies are saved in the `results/[dataset]/assemblies` directory
++ Evaluation tables and graphs are generated in the `results/[dataset]/evaluation` directory
 
-### Mock9 (two-strain separation)
-
-### Mock9 (three-strain separation)
-
-### NWC2 (PacBio)
-
-### NWC2 (Nanopore)
-
-### Human Stool Microbiome
-
-
+where `[dataset]` is either `mock3`, `mock9`, `nwc2_pacbio`, `nwc2_ont`, or `hsm`.
 
 ## Cluster execution
 
-See 
+The documentation for running snakemake in a cluster environment can be found at the following links:
 
-https://snakemake.readthedocs.io/en/stable/executing/cluster.html
-https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles
-https://github.com/snakemake-profiles/doc
++ [Cluster execution](https://snakemake.readthedocs.io/en/stable/executing/cluster.html)
++ [Snakemake Profiles](https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles)
++ Publicly available profiles for varous computing environments can be found at <https://github.com/snakemake-profiles/doc>
 
 
