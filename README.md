@@ -4,7 +4,7 @@
 + [Before running the workflows](#before-running-the-workflows)
 + [Usage](#usage)
 + [Output files](#output-files)
-+ [Cluster execution](#cluster-execution)
++ [Execution in a computing environment](#execution-in-a-computing-environment)
 
 ## System requirements
 
@@ -25,9 +25,9 @@ They have been developed and tested using the following packages/tools (older ve
 Assembly and analysis scripts require the download of publicly available data that will be stored in the
 `resources` sub-directory. Therefore, it is assumed `snakemake` command to be executed from a computing node with internet access.
 
-In a cluster environment, it is however possible to run locally the jobs performing the download of the data 
+In a computing environment (*e.g.*, SLURM, SGE), it is however possible to run locally the jobs performing the download of the data 
 from a frontend node (with internet access) and the rest of the computations on dedicated cluster nodes 
-(without internet access). See [Cluster execution](#cluster-execution) section for more details.
+(without internet access). See "[Execution in a computing environment](#execution-in-a-computing-environment)" section for more details.
 
 #### Note on the Human Stool Microbiome dataset
 
@@ -90,7 +90,7 @@ depend on the dataset processed (see [Usage](#usage)).
 
 where `[dataset]` is either `mock3`, `mock9`, `nwc2_pacbio`, `nwc2_ont`, or `hsm`.
 
-## Cluster execution
+## Execution in a computing environment
 
 The documentation for running snakemake in a computing environment can be found at the following links:
 
