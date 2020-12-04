@@ -32,6 +32,6 @@ subsample_frac: 0.99
 # it will be automatically downloaded in the following path:
 # resources/maxikraken2_1903_140GB 
 # (assuming snakemake command is executed from the root directory as indicated in the README)
-download_kraken2_db: False
+download_kraken2_db: True
 kraken2_db: 'resources/maxikraken2_1903_140GB'
 
