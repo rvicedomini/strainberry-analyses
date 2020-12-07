@@ -10,7 +10,6 @@ import os, glob, snakemake
 # Rules requiring internet connection
 localrules: nwc2_dl_references, nwc2_ont_dl_reads, nwc2_pacbio_dl_reads
 
-#snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
 sample = config["sample"]
 nstrains = int(config["nstrains"])
 

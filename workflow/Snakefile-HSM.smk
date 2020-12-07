@@ -10,7 +10,6 @@ import os, glob, snakemake
 # Rules requiring internet connection
 localrules: hsm_dl_reads, hsm_dl_assembly, hsm_dl_references
 
-#snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
 sample = config['sample']
 nstrains = int(config['nstrains'])
 

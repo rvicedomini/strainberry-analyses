@@ -10,7 +10,6 @@ import os, glob, snakemake
 # Rules requiring internet connection
 localrules: mock_dl_references, mock_dl_data, mock_dl_barcodes
 
-#snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
 sample = config["sample"]
 nstrains = int(config["nstrains"])
 
