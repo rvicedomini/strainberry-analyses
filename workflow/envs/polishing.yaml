@@ -1,6 +1,0 @@
-channels:
-  - bioconda
-  - defaults
-dependencies:
-  - racon==1.3.2
-  - medaka==0.6.5

@@ -1,3 +1,0 @@
-chr - NZ_CP009361.1 S.aureus-ATCC 0 2778854 chr1
-chr - NZ_CP041010.1 S.aureus-FDAA 0 2964112 chr2
-chr - NZ_CP006659.2 K.pneumoniae 0 5435746 chr3
