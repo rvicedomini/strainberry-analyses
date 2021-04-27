@@ -1,0 +1,33 @@
+# dataset/run identifier
+sample: 'mock9'
+
+# sequencing technology of input reads (either 'pacbio' or 'nanopore')
+technology: 'pacbio'
+
+# directory which contains input reads
+read_basepath: 'resources/mock/reads' 
+# list of read file names to be used
+read_filenames: [
+    "m54081_181221_163846.bc1001_BAK8A_OA--bc1001_BAK8A_OA.fq.gz",
+    "m54081_181221_163846.bc1002_BAK8A_OA--bc1002_BAK8A_OA.fq.gz",
+    "m54081_181221_163846.bc1009_BAK8A_OA--bc1009_BAK8A_OA.fq.gz",
+    "m54081_181221_163846.bc1010_BAK8A_OA--bc1010_BAK8A_OA.fq.gz",
+    "m54081_181221_163846.bc1012_BAK8A_OA--bc1012_BAK8A_OA.fq.gz",
+    "m54081_181221_163846.bc1015_BAK8B_OA--bc1015_BAK8B_OA.fq.gz",
+    "m54081_181221_163846.bc1016_BAK8B_OA--bc1016_BAK8B_OA.fq.gz",
+    "m54081_181221_163846.bc1018_BAK8B_OA--bc1018_BAK8B_OA.fq.gz",
+    "m54081_181221_163846.bc1019_BAK8B_OA--bc1019_BAK8B_OA.fq.gz",
+    "m54081_181221_163846.bc1022_BAK8B_OA--bc1022_BAK8B_OA.fq.gz",
+    ]
+
+# CSV-formatted file of: reference-id, reference-fasta-path
+ref_csv: 'resources/mock/mock9.references.csv'
+
+# Estimated metagenome size used by flye/canu
+mg_size: 42m
+
+# Whether to perform read alignment downsampling or not
+subsample: True
+# Value of -s option of samtools view for downsampling
+subsample_frac: 0.15  
+

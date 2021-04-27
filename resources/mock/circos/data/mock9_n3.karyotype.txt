@@ -1,0 +1,3 @@
+chr - NC_000913.3 E.coli-K12 0 4641652 chr4
+chr - NC_017664.1 E.coli-W 0 4897452 chr5
+chr - NZ_CP023645.1 S.sonnei 0 4813450 chr6
