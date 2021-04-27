@@ -150,7 +150,7 @@ def main( argv = None ):
     sepStats,sepSpSet,sepBinStats=load_tsv(opt.sepFile,has_header=True)
 
     binList=list(preStats.keys())
-    binNames=dict( (binid, max(preStats[binid].items(), key=operator.itemgetter(1))[0].split('_')) for binid in preStats.keys() )
+    binNames=dict( (binid, max( (x for x in preStats[binid].items() if x[0]!='others'), key=operator.itemgetter(1))[0].split('_')) for binid in preStats.keys() )
     for binid in binNames:
         #binCoverage=preBinStats[binid]['coverage']
         binNames[binid]=[ x for i,x in enumerate(binNames[binid]) if i!=2 or x not in ['str.','str','strain'] ]

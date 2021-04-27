@@ -1,9 +1,9 @@
 rule mock9_n3_barplots:
     input:
         "results/mock9/evaluation/canu.report.tsv",
-        "results/mock9/evaluation/sberry_canu_n3_scf.report.tsv",
+        "results/mock9/evaluation/sberry_canu.report.tsv",
         "results/mock9/evaluation/flye.report.tsv",
-        "results/mock9/evaluation/sberry_flye_n3_scf.report.tsv",
+        "results/mock9/evaluation/sberry_flye.report.tsv",
     output:
         "results/mock9/evaluation/mock9_n3.asmstats.tsv",
         "results/mock9/evaluation/mock9_n3.ani.barplot.pdf",
@@ -59,14 +59,14 @@ rule mock9_n3_circos_plot:
         'results/mock9/evaluation/circos_mock9_n3/etc/mock9_n3.conf',
         # aligned blocks
         'results/mock9/evaluation/circos_mock9_n3/data/canu.1coords.tsv',
-        'results/mock9/evaluation/circos_mock9_n3/data/sberry_canu_n3_scf.1coords.tsv',
+        'results/mock9/evaluation/circos_mock9_n3/data/sberry_canu.1coords.tsv',
         'results/mock9/evaluation/circos_mock9_n3/data/flye.1coords.tsv',
-        'results/mock9/evaluation/circos_mock9_n3/data/sberry_flye_n3_scf.1coords.tsv',
+        'results/mock9/evaluation/circos_mock9_n3/data/sberry_flye.1coords.tsv',
         # snps intervals
         'results/mock9/evaluation/circos_mock9_n3/data/canu.snps.int.tsv',
-        'results/mock9/evaluation/circos_mock9_n3/data/sberry_canu_n3_scf.snps.int.tsv',
+        'results/mock9/evaluation/circos_mock9_n3/data/sberry_canu.snps.int.tsv',
         'results/mock9/evaluation/circos_mock9_n3/data/flye.snps.int.tsv',
-        'results/mock9/evaluation/circos_mock9_n3/data/sberry_flye_n3_scf.snps.int.tsv',
+        'results/mock9/evaluation/circos_mock9_n3/data/sberry_flye.snps.int.tsv',
     output: 
         'results/mock9/evaluation/mock9_n3_circos.svg'
     log:   

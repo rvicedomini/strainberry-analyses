@@ -1,51 +1,40 @@
 import os, glob, snakemake
 
-# The main entry point of your workflow.
-# After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
-#report: "report/workflow.rst"
-
-# Allow users to fix the underlying OS via singularity.
-#singularity: "docker://continuumio/miniconda3" # Allow users to fix the underlying OS via singularity.
-
 # Rules requiring internet connection
 localrules: hsm_dl_reads, hsm_dl_assembly, hsm_dl_references
 
 sample = config['sample']
-nstrains = int(config['nstrains'])
-
 
 rule all:
     input:
         # NWC2 - ONT resources
         expand('{basepath}/{filename}', basepath=config['read_basepath'], filename=config['read_filenames']),
         config['ref_csv'],
-        # strainberry input: strain-oblivious assemblies & alignments
+        # Strainberry input: strain-oblivious assemblies & alignments
         f'results/{sample}/assemblies/flye.fa',
         f'results/{sample}/alignments/flye.bam',
         f'results/{sample}/assemblies/lathe-p1.fa',
         f'results/{sample}/alignments/lathe-p1.bam',
-        # strainberry separation of lathe reference assembly
-        f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_ctg.fa',
-        f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_scf.fa',
-        # strainberry polished contig assembly
-        f'results/{sample}/assemblies/medaka/sberry_lathe-p1_n{nstrains}_ctg/contigs',
-        f'results/{sample}/assemblies/sberry_lathe-p1_n{nstrains}_ctg.medaka.fa',
-        # kraken2 classification of contigs
+        # Strainberry separation of lathe reference assembly
+        f'results/{sample}/assemblies/sberry_lathe-p1.fa',
+        # Kraken2 classification of contigs
         f'results/{sample}/kraken2/lathe-p1.kraken2',
-        f'results/{sample}/kraken2/sberry_lathe-p1_n{nstrains}_ctg.medaka.kraken2',
-        # binning
+        # Lathe binning
         f'results/{sample}/binning/lathe-p1.depth.txt',
-        f'results/{sample}/binning/sberry_lathe-p1_n{nstrains}_ctg.medaka.depth.txt',
-        # best bins
+        f'results/{sample}/binning/lathe-p1.bins.tsv',
         f'results/{sample}/evaluation/lathe-p1.bin_stats.tsv',
-        f'results/{sample}/evaluation/sberry_lathe-p1_n{nstrains}_ctg.medaka.bin_stats.tsv',
-        # vatypica/ plots
-        f'results/{sample}/evaluation/sberry_lathe-p1.vatypica.depth.pdf',
-        f'results/{sample}/evaluation/sberry_lathe-p1.eeligens.depth.pdf',
+        # Strainberry separation of lathe's best bins
+        f'results/{sample}/evaluation/strainberry.bin_stats.tsv',
+        f'results/{sample}/evaluation/strainberry_racon.bin_stats.tsv',
+        f'results/{sample}/evaluation/strainberry_medaka.bin_stats.tsv',
+        # V. atypica and E. eligens plots
+        f'results/{sample}/evaluation/strainberry_lathe-p1.eeligens.depth.pdf',
+        f'results/{sample}/evaluation/strainberry_lathe-p1.vatypica.depth.pdf',
+        f'results/{sample}/evaluation/strainberry_medaka.vatypica.ACS-049-V-Sch6.ps',
+        f'results/{sample}/evaluation/strainberry_medaka.vatypica.ACS-134-V-Col7a.ps',
         # pre/post separation plot
-        f'results/{sample}/evaluation/sberry_lathe-p1.barplot.pdf',
-        f'results/{sample}/evaluation/sberry_lathe-p1.barplot.svg',
-
+        f'results/{sample}/evaluation/lathe-p1_strainberry.barplot.pdf',
+        f'results/{sample}/evaluation/lathe-p1_strainberry.barplot.svg',
 
 
 # Common utilities (e.g., samtools faidx/index)
@@ -58,11 +47,11 @@ include: "rules/hsm_resources.smk"
 include: "rules/hsm_assembly.smk"
 include: "rules/alignment.smk"
 
-# Strainberry rules
+# Canonical Strainberry separation
 include: "rules/strainberry.smk"
 
-# Polishing
-include: 'rules/hsm_polishing.smk'
+# Bin-specific Strainberry separation and polishing
+include: "rules/hsm_strainberry.smk"
 
 # Classification, binning, evaluation, plots
 include: "rules/hsm_evaluation.smk"

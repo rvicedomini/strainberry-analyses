@@ -10,14 +10,9 @@ read_basepath: 'resources/nwc2/reads'
 read_filenames: [ 
     "SRR7585901.fastq.gz",
     ]
-# whether read sequences have associated base-quality values
-read_has_qual: False
 
 # CSV-formatted file of: reference-id, reference-fasta-path
 ref_csv: 'resources/nwc2/nwc2.references.csv'
-
-# Strainberry's -n parameter (strain multiplicity)
-nstrains: 2 
 
 # Estimated metagenome size used by flye/canu
 mg_size: 8m

@@ -23,5 +23,5 @@ rule flye_assembly:
 rule lathe_assembly:
     input:  'resources/hsm/assembly/GCA_011075405.1.fasta'
     output: 'results/{sample}/assemblies/lathe-p1.fa'
-    shell:  'ln -s "$(readlink -f {input})" {output}'
+    shell:  'ln "$(readlink -f {input})" {output}'
 

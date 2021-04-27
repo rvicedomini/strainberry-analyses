@@ -40,32 +40,6 @@ rule hsm_lathe_binning:
           && python3 workflow/scripts/seq2bin.py -i {output.bins} -x fa -o {output.seq2bin} 2>>{log}
         """
 
-# Strainberry bins are not created with metabat2
-# In order to compare species/strain assemblies before/after the separation,
-# Strainberry bins generated with the separated sequences of each Lathe bin
-rule hsm_sberry_binning:
-    input:
-        sberry_fasta='results/hsm/assemblies/sberry_lathe-p1_n2_ctg.medaka.fa',
-        bam='results/hsm/alignments/sberry_lathe-p1_n2_ctg.medaka.bam',
-        bamidx='results/hsm/alignments/sberry_lathe-p1_n2_ctg.medaka.bam.bai',
-        lathe_seq2bin='results/hsm/binning/lathe-p1.bins.tsv',
-    output:
-        depth='results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka.depth.txt',
-        bins=directory('results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka'),
-        seq2bin='results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka.bins.tsv',
-    log:
-        'logs/hsm/sberry_lathe-p1_n2_ctg.medaka_binning.log'
-    conda:
-        "../envs/evaluation.yaml"
-    threads:
-        workflow.cores
-    shell:
-        """
-        jgi_summarize_bam_contig_depths --minContigLength 1000 --minContigDepth 1 --percentIdentity 50 --outputDepth {output.depth} {input.bam} 2>{log} \
-          && python3 workflow/scripts/sberry_map2bins.py -i {input.sberry_fasta} -s {input.lathe_seq2bin} -b {output.bins} -x fa -f 2>>{log} \
-          && python3 workflow/scripts/seq2bin.py -i {output.bins} -x fa -o {output.seq2bin} 2>>{log}
-        """
-
 rule hsm_checkm_eval:
     input:
         depth='results/{sample}/binning/{assembly}.depth.txt',
@@ -120,68 +94,95 @@ rule hsm_bin_stats:
 
 rule hsm_barplot:
     input:
-        lathe='results/hsm/evaluation/lathe-p1.bin_stats.tsv',
-        sberry='results/hsm/evaluation/sberry_lathe-p1_n2_ctg.medaka.bin_stats.tsv',
+        lathe='results/{sample}/evaluation/lathe-p1.bin_stats.tsv',
+        sberry='results/{sample}/evaluation/strainberry_medaka.bin_stats.tsv',
     output:
-        'results/hsm/evaluation/sberry_lathe-p1.barplot.pdf',
-        'results/hsm/evaluation/sberry_lathe-p1.barplot.svg',
+        'results/{sample}/evaluation/lathe-p1_strainberry.barplot.pdf',
+        'results/{sample}/evaluation/lathe-p1_strainberry.barplot.svg',
     conda:
         "../envs/evaluation.yaml"
     shell:
         """
-        python3 workflow/scripts/hsm_barplot.py --pre {input.lathe} --sep {input.sberry} --prefix results/hsm/evaluation/sberry_lathe-p1.barplot
+        python3 workflow/scripts/hsm_barplot.py --pre {input.lathe} --sep {input.sberry} --prefix results/{wildcards.sample}/evaluation/lathe-p1_strainberry.barplot
         """
 
 rule hsm_vatypica:
     input:
-        lathe_binstats='results/hsm/evaluation/lathe-p1.bin_stats.tsv',
-        lathe_seq2bin='results/hsm/binning/lathe-p1.bins.tsv',
-        lathe_depth='results/hsm/binning/lathe-p1.depth.txt',
-        sberry_seq2bin='results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka.bins.tsv',
-        sberry_depth='results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka.depth.txt',
+        lathe_binstats='results/{sample}/evaluation/lathe-p1.bin_stats.tsv',
+        lathe_seq2bin='results/{sample}/binning/lathe-p1.bins.tsv',
+        lathe_depth='results/{sample}/binning/lathe-p1.depth.txt',
+        sberry_done='results/{sample}/binning/strainberry_medaka.done',
     output:
-        outdir=directory('results/hsm/vatypica'),
-        plot='results/hsm/evaluation/sberry_lathe-p1.vatypica.depth.pdf'
+        outdir=directory('results/{sample}/vatypica'),
+        plot='results/{sample}/evaluation/strainberry_lathe-p1.vatypica.depth.pdf'
     conda:
         "../envs/evaluation.yaml"
     shell:
         """
         mkdir -p {output.outdir}
-        vatypica_bin="$(fgrep -m1 'Veillonella_atypica' {input.lathe_binstats} | awk '{{print $1;exit}}')"
+        vatypica_bin="$(grep -m1 -F 'Veillonella_atypica' {input.lathe_binstats} | awk '{{printf("%s",$1);exit}}')"
 
         awk -v binid="${{vatypica_bin}}" '$2==binid{{print $1}}' {input.lathe_seq2bin} > {output.outdir}/lathe-p1.vatypica.list
         awk 'BEGIN{{OFS="\\t"}} FNR==NR{{seq[$1]++;next}} ($1 in seq){{print $1,$2,$3}}' {output.outdir}/lathe-p1.vatypica.list {input.lathe_depth} >{output.outdir}/lathe-p1.vatypica.depth.tsv
+        
+        cut -f1 results/{wildcards.sample}/binning/strainberry_medaka/"${{vatypica_bin}}".fa.fai > {output.outdir}/strainberry_medaka.vatypica.list
+        cut -f1,2,3 results/{wildcards.sample}/binning/strainberry_medaka/"${{vatypica_bin}}".depth | tail -q -n+2 >{output.outdir}/strainberry_medaka.vatypica.depth.tsv
 
-        awk -v binid="${{vatypica_bin}}" '$2==binid{{print $1}}' {input.sberry_seq2bin} > {output.outdir}/sberry_lathe-p1.vatypica.list
-        awk 'BEGIN{{OFS="\\t"}} FNR==NR{{seq[$1]++;next}} ($1 in seq){{print $1,$2,$3}}' {output.outdir}/sberry_lathe-p1.vatypica.list {input.sberry_depth} >{output.outdir}/sberry_lathe-p1.vatypica.depth.tsv
-
-        python3 workflow/scripts/plot_coverage_diff.py --before {output.outdir}/lathe-p1.vatypica.depth.tsv --after {output.outdir}/sberry_lathe-p1.vatypica.depth.tsv --prefix results/hsm/evaluation/sberry_lathe-p1.vatypica.depth
+        python3 workflow/scripts/hsm_plot_coverage.py --before {output.outdir}/lathe-p1.vatypica.depth.tsv --after {output.outdir}/strainberry_medaka.vatypica.depth.tsv --prefix results/{wildcards.sample}/evaluation/strainberry_lathe-p1.vatypica.depth
         """
+
+rule hsm_vatypica_mummerplot:
+    input:
+        lathe_binstats='results/{sample}/evaluation/lathe-p1.bin_stats.tsv',
+        strainberry_binstats='results/{sample}/evaluation/strainberry_medaka.bin_stats.tsv',
+        vasch6_ref='resources/{sample}/references/NZ_AEDR00000000.1.fasta',
+        vacol7_ref='resources/{sample}/references/NZ_AEDS00000000.1.fasta'
+    output:
+        outdir=directory('results/{sample}/vatypica'),
+        vasch6='results/{sample}/evaluation/strainberry_medaka.vatypica.ACS-049-V-Sch6.ps',
+        vacol7='results/{sample}/evaluation/strainberry_medaka.vatypica.ACS-134-V-Col7a.ps'
+    conda:
+        "../envs/mummerplot.yaml"
+    shell:
+        """
+        mkdir -p {output.outdir}
+        vatypica_bin="$(grep -m1 -F 'Veillonella_atypica' {input.lathe_binstats} | awk '{{printf("%s",$1);exit}}')"
+
+        grep -F 'ACS-049-V-Sch6' results/{wildcards.sample}/binning/strainberry_medaka/"${{vatypica_bin}}".kraken2 | cut -f2 | xargs samtools faidx results/{wildcards.sample}/binning/strainberry_medaka/"${{vatypica_bin}}".fa > {output.outdir}/strainberry_medaka.ACS-049-V-Sch6.fa
+        nucmer --maxmatch -p {output.outdir}/strainberry_medaka.ACS-049-V-Sch6 {input.vasch6_ref} {output.outdir}/strainberry_medaka.ACS-049-V-Sch6.fa
+        mummerplot -c --layout --postscript -p {output.outdir}/strainberry_medaka.ACS-049-V-Sch6 -R {input.vasch6_ref} -Q {output.outdir}/strainberry_medaka.ACS-049-V-Sch6.fa {output.outdir}/strainberry_medaka.ACS-049-V-Sch6.delta
+        mv {output.outdir}/strainberry_medaka.ACS-049-V-Sch6.ps {output.vasch6}
+
+        grep -F 'ACS-134-V-Col7a' results/{wildcards.sample}/binning/strainberry_medaka/"${{vatypica_bin}}".kraken2 | cut -f2 | xargs samtools faidx results/{wildcards.sample}/binning/strainberry_medaka/"${{vatypica_bin}}".fa > {output.outdir}/strainberry_medaka.ACS-134-V-Col7a.fa
+        nucmer --maxmatch -p {output.outdir}/strainberry_medaka.ACS-134-V-Col7a {input.vacol7_ref} {output.outdir}/strainberry_medaka.ACS-134-V-Col7a.fa
+        mummerplot -c --layout --postscript -p {output.outdir}/strainberry_medaka.ACS-134-V-Col7a -R {input.vacol7_ref} -Q {output.outdir}/strainberry_medaka.ACS-134-V-Col7a.fa {output.outdir}/strainberry_medaka.ACS-134-V-Col7a.delta
+        mv {output.outdir}/strainberry_medaka.ACS-134-V-Col7a.ps {output.vacol7}
+        """
+
 
 rule hsm_eeligens:
     input:
-        lathe_binstats='results/hsm/evaluation/lathe-p1.bin_stats.tsv',
-        lathe_seq2bin='results/hsm/binning/lathe-p1.bins.tsv',
-        lathe_depth='results/hsm/binning/lathe-p1.depth.txt',
-        sberry_seq2bin='results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka.bins.tsv',
-        sberry_depth='results/hsm/binning/sberry_lathe-p1_n2_ctg.medaka.depth.txt',
+        lathe_binstats='results/{sample}/evaluation/lathe-p1.bin_stats.tsv',
+        lathe_seq2bin='results/{sample}/binning/lathe-p1.bins.tsv',
+        lathe_depth='results/{sample}/binning/lathe-p1.depth.txt',
+        sberry_done='results/{sample}/binning/strainberry_medaka.done',
     output:
-        outdir=directory('results/hsm/eeligens'),
-        plot='results/hsm/evaluation/sberry_lathe-p1.eeligens.depth.pdf'
+        outdir=directory('results/{sample}/eeligens'),
+        plot='results/{sample}/evaluation/strainberry_lathe-p1.eeligens.depth.pdf'
     conda:
         "../envs/evaluation.yaml"
     shell:
         """
         mkdir -p {output.outdir}
-        eeligens_bin="$(fgrep -m1 '[Eubacterium]_eligens' {input.lathe_binstats} | awk '{{print $1;exit}}')"
+        eeligens_bin="$(grep -m1 -F '[Eubacterium]_eligens' {input.lathe_binstats} | awk '{{printf("%s",$1);exit}}')"
 
         awk -v binid="${{eeligens_bin}}" '$2==binid{{print $1}}' {input.lathe_seq2bin} > {output.outdir}/lathe-p1.eeligens.list
         awk 'BEGIN{{OFS="\\t"}} FNR==NR{{seq[$1]++;next}} ($1 in seq){{print $1,$2,$3}}' {output.outdir}/lathe-p1.eeligens.list {input.lathe_depth} >{output.outdir}/lathe-p1.eeligens.depth.tsv
 
-        awk -v binid="${{eeligens_bin}}" '$2==binid{{print $1}}' {input.sberry_seq2bin} > {output.outdir}/sberry_lathe-p1.eeligens.list
-        awk 'BEGIN{{OFS="\\t"}} FNR==NR{{seq[$1]++;next}} ($1 in seq){{print $1,$2,$3}}' {output.outdir}/sberry_lathe-p1.eeligens.list {input.sberry_depth} >{output.outdir}/sberry_lathe-p1.eeligens.depth.tsv
-
-        python3 workflow/scripts/plot_coverage_diff.py --before {output.outdir}/lathe-p1.eeligens.depth.tsv --after {output.outdir}/sberry_lathe-p1.eeligens.depth.tsv --prefix results/hsm/evaluation/sberry_lathe-p1.eeligens.depth
+        cut -f1 results/{wildcards.sample}/binning/strainberry_medaka/"${{eeligens_bin}}".fa.fai > {output.outdir}/strainberry_medaka.eeligens.list
+        cut -f1,2,3 results/{wildcards.sample}/binning/strainberry_medaka/"${{eeligens_bin}}".depth | tail -q -n+2 >{output.outdir}/strainberry_medaka.eeligens.depth.tsv
+        
+        python3 workflow/scripts/hsm_plot_coverage.py --before {output.outdir}/lathe-p1.eeligens.depth.tsv --after {output.outdir}/strainberry_medaka.eeligens.depth.tsv --prefix results/{wildcards.sample}/evaluation/strainberry_lathe-p1.eeligens.depth
         """
 
 

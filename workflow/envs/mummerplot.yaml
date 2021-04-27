@@ -1,0 +1,6 @@
+channels:
+  - bioconda
+  - defaults
+dependencies:
+  - mummer==3.23
+  - samtools==1.10

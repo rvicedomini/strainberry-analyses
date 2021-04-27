@@ -14,7 +14,7 @@ def aggr_hits(lst):
     sumWeights=0
     sumIdy=0
     lastBase=0
-    qryCovBases=0
+    qryAlnBases=0
     qryBases=0
     for hit in sorted(lst,key=lambda x:int(x[2])): # process list sorted by coordinate on query
         qBeg=int(hit[2])-1
@@ -22,12 +22,12 @@ def aggr_hits(lst):
         weight=int(hit[4])+int(hit[5])
         sumWeights+=weight
         sumIdy+=float(hit[6])*weight
-        qryCovBases+= (qEnd-qBeg) if qBeg >= lastBase else (qEnd-lastBase)
+        qryAlnBases+= (qEnd-qBeg) if qBeg >= lastBase else (qEnd-lastBase)
         lastBase=qEnd # last position covered in query
         qryBases=int(hit[8])
     avgIdy = sumIdy/float(sumWeights) if sumWeights!=0 else 0.0
-    covBases = (100.0*qryCovBases)/qryBases if qryBases!=0 else 0.0
-    return [avgIdy,covBases]
+    covBases = (100.0*qryAlnBases)/qryBases if qryBases!=0 else 0.0
+    return [avgIdy,covBases,qryAlnBases]
 
 def fasta_n50(path,genome_size=0):
     seqLengths=[]
@@ -93,8 +93,8 @@ def main( argv = None ):
             ref_id,ref_fasta=line.rstrip().split(',')
             refSeqDict[ref_id]=ref_fasta
 
-    qrySeq={ qseq.id:qseq for qseq in SeqIO.parse(opt.fastaFile,'fasta') }
-    qryLen={ qid:len(qseq) for qid,qseq in qrySeq.items() }
+    qrySeq={ qrec.id:qrec for qrec in SeqIO.parse(opt.fastaFile,'fasta') }
+    qryLen={ qid:len(qrec) for qid,qrec in qrySeq.items() }
 
     # run MUMMer to align references to fasta, store results in a temporary directory
     qryMumDict = defaultdict(list)
@@ -135,56 +135,42 @@ def main( argv = None ):
                     qryMumDict[(qry_id,ref_id)].append(hit)
 
     # aggregate hits concerning the same query
-    qryHitDict=defaultdict(list)
+    qryHitList=defaultdict(list)
     for p,lst in qryMumDict.items():
         qry_id,ref_id = p
-        qry_ani,qry_frac = aggr_hits(lst)
-        qryHitDict[qry_id].append((ref_id,qry_ani,qry_frac))
+        qry_ani,qry_frac,qry_bases = aggr_hits(lst)
+        if qry_frac >= 50:
+            qryHitList[qry_id].append((ref_id,qry_ani,qry_frac,qry_bases))
     
     # create output directory if it does not exists
     pathlib.Path(opt.outDir).mkdir(parents=True,exist_ok=True)
 
     # assign best refrences to each query sequence
-    qryBestDict={}
     with open(f'{opt.outDir}/assembly.bestref.tsv','w') as outfile:
         for qry,qry_len in qryLen.items():
             # assign queries to references w.r.t. alignment coverage/identity
-            hitlst=qryHitDict[qry]
-            outlist=[qry]
-            goodcov_hits = [ hit for hit in hitlst if hit[2]>=90 ] # hits with good enough coverage
-            goodidy_hits = [ hit for hit in goodcov_hits if hit[1]>=99.9 ]
-            reflist=[]
-            idylist=[]
-            covlist=[]
-            if len(goodidy_hits) > 0:
-                qryBestDict[qry]=goodidy_hits
-                reflist+=[ hit[0] for hit in goodidy_hits ]
-                idylist+=[ f'{hit[1]:.2f}' for hit in goodidy_hits ]
-                covlist+=[ f'{hit[2]:.2f}' for hit in goodidy_hits ]
-            elif len(goodcov_hits) > 0:
-                bestidy=int(100*max(goodcov_hits,key=operator.itemgetter(1))[1])
-                qryBestDict[qry]=[ hit for hit in goodcov_hits if int(100*hit[1])==bestidy ]
-                reflist+=[ hit[0] for hit in goodcov_hits if int(100*hit[1])==bestidy ]
-                idylist+=[ f'{hit[1]:.2f}' for hit in goodcov_hits if int(100*hit[1])==bestidy ]
-                covlist+=[ f'{hit[2]:.2f}' for hit in goodcov_hits if int(100*hit[1])==bestidy ]
+            outrow=[qry]
+            if len(qryHitList[qry]) > 0:
+                qryHitList[qry].sort(key=lambda hit:hit[1]*hit[3],reverse=True)
+                best_ref,best_ani,best_cov,best_alnbases=qryHitList[qry][0]
+                outrow.append(best_ref)
+                outrow.append(f'{best_ani:.2f}')
+                outrow.append(f'{best_cov:.2f}')
             else:
-                qryBestDict[qry]=[]
-                reflist+=['none']
-                idylist+=['*']
-                covlist+=['*']
-            outlist.append(';'.join(reflist))
-            outlist.append(';'.join(idylist))
-            outlist.append(';'.join(covlist))
-            outlist.append(f'{qry_len}')
-            outfile.write('\t'.join(outlist)+'\n')
+                outrow += ['none','*','*']
+            outrow.append(f'{qry_len}')
+            outfile.write('\t'.join(outrow)+'\n')
 
     # output strain-specific files
     eprint("generating strain-specific fasta files according to best-reference")
     with contextlib.ExitStack() as stack:
         ref_list = list(refSeqDict.keys()) + ['none']
         ssOutFile = { ref_id:stack.enter_context(open(os.path.join(opt.outDir,f'assembly.{ref_id}.fa'),'w')) for ref_id in ref_list }
-        for qry,besthits in qryBestDict.items():
-            for hit in besthits:
+        for qry,sortedhits in qryHitList.items():
+            if len(sortedhits) == 0:
+                ssOutFile['none'].write(qrySeq[qry].format('fasta'))
+                continue
+            for hit in sortedhits:
                 ref_id = hit[0]
                 ssOutFile[ref_id].write(qrySeq[qry].format('fasta'))
                 break # take the first hit only
@@ -244,7 +230,7 @@ def main( argv = None ):
             relocations = int(report['Relocations'][2])
             transloc = int(report['Translocations'][2])
             outCols = [ 
-                    f'{ref_id}', f'{seq_num}', f'{ref_size}', f'{asm_size}', f'{N50}', f'{unaligned_ref:.2f}%', f'{unaligned_asm:.2f}%', f'{ANI:.2f}', 
+                    f'{ref_id}', f'{seq_num}', f'{ref_size}', f'{asm_size}', f'{N50}', f'{unaligned_ref:.2f}', f'{unaligned_asm:.2f}', f'{ANI:.2f}', 
                     f'{dup_ratio:.2f}', f'{dup_bases}', f'{cmp_bases}', f'{snps}', f'{inversions}', f'{relocations}', f'{transloc}'
                     ]
             outReport.write('\t'.join(outCols) + '\n')

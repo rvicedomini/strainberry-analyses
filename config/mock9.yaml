@@ -19,14 +19,9 @@ read_filenames: [
     "m54081_181221_163846.bc1019_BAK8B_OA--bc1019_BAK8B_OA.fq.gz",
     "m54081_181221_163846.bc1022_BAK8B_OA--bc1022_BAK8B_OA.fq.gz",
     ]
-# whether read sequences have associated base-quality values
-read_has_qual: False
 
 # CSV-formatted file of: reference-id, reference-fasta-path
 ref_csv: 'resources/mock/mock9.references.csv'
-
-# Strainberry's -n parameter (strain multiplicity)
-nstrains: 2 
 
 # Estimated metagenome size used by flye/canu
 mg_size: 42m

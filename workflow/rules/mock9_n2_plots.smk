@@ -1,9 +1,9 @@
 rule mock9_n2_barplots:
     input:
         "results/mock9/evaluation/canu.report.tsv",
-        "results/mock9/evaluation/sberry_canu_n2_scf.report.tsv",
+        "results/mock9/evaluation/sberry_canu.report.tsv",
         "results/mock9/evaluation/flye.report.tsv",
-        "results/mock9/evaluation/sberry_flye_n2_scf.report.tsv",
+        "results/mock9/evaluation/sberry_flye.report.tsv",
     output:
         "results/mock9/evaluation/mock9_n2.asmstats.tsv",
         "results/mock9/evaluation/mock9_n2.ani.barplot.pdf",
@@ -15,7 +15,7 @@ rule mock9_n2_barplots:
         for f in {input}; do
             fbase=${{f##*/}}
             asmname=${{fbase%%.*}}
-            egrep -v '^#' ${{f}} | egrep 'Kpneumoniae|Saureus-ATCC|Saureus-FDAA' \
+            egrep -v '^#' ${{f}} | egrep 'Saureus-ATCC|Saureus-FDAA|Kpneumoniae' \
               | awk -v asmname=${{asmname}} '{{OFS="\\t";print asmname,$0}}'
         done >{output[0]}
         python3 workflow/scripts/assembly_barplots.py -i {output[0]} -p results/mock9/evaluation/mock9_n2
@@ -58,14 +58,14 @@ rule mock9_n2_circos_plot:
         'results/mock9/evaluation/circos_mock9_n2/etc/mock9_n2.conf',
         # aligned blocks
         'results/mock9/evaluation/circos_mock9_n2/data/canu.1coords.tsv',
-        'results/mock9/evaluation/circos_mock9_n2/data/sberry_canu_n2_scf.1coords.tsv',
+        'results/mock9/evaluation/circos_mock9_n2/data/sberry_canu.1coords.tsv',
         'results/mock9/evaluation/circos_mock9_n2/data/flye.1coords.tsv',
-        'results/mock9/evaluation/circos_mock9_n2/data/sberry_flye_n2_scf.1coords.tsv',
+        'results/mock9/evaluation/circos_mock9_n2/data/sberry_flye.1coords.tsv',
         # snps intervals
         'results/mock9/evaluation/circos_mock9_n2/data/canu.snps.int.tsv',
-        'results/mock9/evaluation/circos_mock9_n2/data/sberry_canu_n2_scf.snps.int.tsv',
+        'results/mock9/evaluation/circos_mock9_n2/data/sberry_canu.snps.int.tsv',
         'results/mock9/evaluation/circos_mock9_n2/data/flye.snps.int.tsv',
-        'results/mock9/evaluation/circos_mock9_n2/data/sberry_flye_n2_scf.snps.int.tsv',
+        'results/mock9/evaluation/circos_mock9_n2/data/sberry_flye.snps.int.tsv',
     output: 
         'results/mock9/evaluation/mock9_n2_circos.svg'
     log:

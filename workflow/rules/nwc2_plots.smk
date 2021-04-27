@@ -14,7 +14,9 @@ rule nwc2_assembly_align:
     shell:
         """
         refpath="$( awk -F, -v rid="{wildcards.refname}" '$1==rid{{printf("%s",$2);exit}}' "{input.ref_csv}" )"
-        minimap2 -ax asm20 -t {threads} --cs "${{refpath}}" {input.asm} | samtools sort --threads {threads} -o {output.bam}
+        minimap2 -ax asm20 -t {threads} "${{refpath}}" {input.asm} 2>{log} \
+          | samtools view -bhu - 2>>{log} \
+          | samtools sort --threads {threads} -o {output.bam} 2>>{log}
         """
 
 
@@ -31,11 +33,11 @@ rule nwc2_refcoverage_plot:
     input:
         bam1='results/{sample}/alignments/{assembly}-{refname}.bam',
         bai1='results/{sample}/alignments/{assembly}-{refname}.bam.bai',
-        bam2='results/{sample}/alignments/sberry_{assembly}_n2_scf-{refname}.bam',
-        bai2='results/{sample}/alignments/sberry_{assembly}_n2_scf-{refname}.bam.bai',
+        bam2='results/{sample}/alignments/sberry_{assembly}-{refname}.bam',
+        bai2='results/{sample}/alignments/sberry_{assembly}-{refname}.bam.bai',
     output:
         bedgz1='results/{sample}/evaluation/mosdepth/{assembly}-{refname}.regions.bed.gz',
-        bedgz2='results/{sample}/evaluation/mosdepth/sberry_{assembly}_n2_scf-{refname}.regions.bed.gz',
+        bedgz2='results/{sample}/evaluation/mosdepth/sberry_{assembly}-{refname}.regions.bed.gz',
         svg='results/{sample}/evaluation/refcoverage_{refname}-{assembly}.svg'
     log:
         'logs/{sample}/refcoverage_{refname}-{assembly}.log'
@@ -49,7 +51,7 @@ rule nwc2_refcoverage_plot:
         """
         mkdir -p results/{wildcards.sample}/evaluation/mosdepth \
           && mosdepth -t {threads} --by 20000 -m -x results/{wildcards.sample}/evaluation/mosdepth/{wildcards.assembly}-{wildcards.refname} {input.bam1} >{log} \
-          && mosdepth -t {threads} --by 20000 -m -x results/{wildcards.sample}/evaluation/mosdepth/sberry_{wildcards.assembly}_n2_scf-{wildcards.refname} {input.bam2} >{log} \
+          && mosdepth -t {threads} --by 20000 -m -x results/{wildcards.sample}/evaluation/mosdepth/sberry_{wildcards.assembly}-{wildcards.refname} {input.bam2} >{log} \
           && python3 workflow/scripts/assembly_refcoverage.py -m {params.maxcov} -b {output.bedgz1} {output.bedgz2} \
                -p results/{wildcards.sample}/evaluation/refcoverage_{wildcards.refname}-{wildcards.assembly} >>{log}
         """

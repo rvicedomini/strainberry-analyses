@@ -11,22 +11,18 @@ import os, glob, snakemake
 localrules: nwc2_dl_references, nwc2_ont_dl_reads, nwc2_pacbio_dl_reads
 
 sample = config["sample"]
-nstrains = int(config["nstrains"])
-
 
 def nwc2_plots(sample):
-    plot_files = []
-    if nstrains == 2:
-        plot_files = [
-            f'results/{sample}/evaluation/refcoverage_Sthermophilus_NWC_2_1-flye.svg',
-            f'results/{sample}/evaluation/refcoverage_Ldelbrueckii_NWC_2_2-flye.svg',
-            f'results/{sample}/evaluation/refcoverage_Lhelveticus_NWC_2_3-flye.svg',
-            f'results/{sample}/evaluation/refcoverage_Lhelveticus_NWC_2_4-flye.svg',
-            f'results/{sample}/evaluation/refcoverage_Sthermophilus_NWC_2_1-canu.svg',
-            f'results/{sample}/evaluation/refcoverage_Ldelbrueckii_NWC_2_2-canu.svg',
-            f'results/{sample}/evaluation/refcoverage_Lhelveticus_NWC_2_3-canu.svg',
-            f'results/{sample}/evaluation/refcoverage_Lhelveticus_NWC_2_4-canu.svg',
-        ]
+    plot_files = [
+        f'results/{sample}/evaluation/refcoverage_Sthermophilus_NWC_2_1-flye.svg',
+        f'results/{sample}/evaluation/refcoverage_Ldelbrueckii_NWC_2_2-flye.svg',
+        f'results/{sample}/evaluation/refcoverage_Lhelveticus_NWC_2_3-flye.svg',
+        f'results/{sample}/evaluation/refcoverage_Lhelveticus_NWC_2_4-flye.svg',
+        f'results/{sample}/evaluation/refcoverage_Sthermophilus_NWC_2_1-canu.svg',
+        f'results/{sample}/evaluation/refcoverage_Ldelbrueckii_NWC_2_2-canu.svg',
+        f'results/{sample}/evaluation/refcoverage_Lhelveticus_NWC_2_3-canu.svg',
+        f'results/{sample}/evaluation/refcoverage_Lhelveticus_NWC_2_4-canu.svg',
+    ]
     return plot_files
 
 
@@ -41,24 +37,18 @@ rule all:
         f'results/{sample}/assemblies/canu.fa',
         f'results/{sample}/alignments/canu.bam',
         # strainberry assemblies
-        f'results/{sample}/assemblies/sberry_flye_n{nstrains}_ctg.fa',
-        f'results/{sample}/assemblies/sberry_flye_n{nstrains}_scf.fa',
-        f'results/{sample}/assemblies/sberry_canu_n{nstrains}_ctg.fa',
-        f'results/{sample}/assemblies/sberry_canu_n{nstrains}_scf.fa',
+        f'results/{sample}/assemblies/sberry_flye.fa',
+        f'results/{sample}/assemblies/sberry_canu.fa',
         # assembly evaluation stats
         f'results/{sample}/evaluation/flye.report.tsv',
-        f'results/{sample}/evaluation/sberry_flye_n{nstrains}_ctg.report.tsv',
-        f'results/{sample}/evaluation/sberry_flye_n{nstrains}_scf.report.tsv',
+        f'results/{sample}/evaluation/sberry_flye.report.tsv',
         f'results/{sample}/evaluation/canu.report.tsv',
-        f'results/{sample}/evaluation/sberry_canu_n{nstrains}_ctg.report.tsv',
-        f'results/{sample}/evaluation/sberry_canu_n{nstrains}_scf.report.tsv',
+        f'results/{sample}/evaluation/sberry_canu.report.tsv',
         # checkm evaluation
         f'results/{sample}/evaluation/flye.checkm.tsv',
-        f'results/{sample}/evaluation/sberry_flye_n{nstrains}_ctg.checkm.tsv',
-        f'results/{sample}/evaluation/sberry_flye_n{nstrains}_scf.checkm.tsv',
+        f'results/{sample}/evaluation/sberry_flye.checkm.tsv',
         f'results/{sample}/evaluation/canu.checkm.tsv',
-        f'results/{sample}/evaluation/sberry_canu_n{nstrains}_ctg.checkm.tsv',
-        f'results/{sample}/evaluation/sberry_canu_n{nstrains}_scf.checkm.tsv',
+        f'results/{sample}/evaluation/sberry_canu.checkm.tsv',
         # reference coverage plots
         nwc2_plots(sample),
 

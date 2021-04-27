@@ -9,16 +9,13 @@
 ## System requirements
 
 + GNU bash (version 4+ recommended)
-+ Standard development packages with a GCC version supporting C++11:
-    - Debian/Ubuntu: `build-essential` and `python3-dev`
-    - RedHat/CentOS/Fedora: `gcc`, `gcc-c++`, `glibc-devel`, `make`, and `python3-devel`
 
 Strainberry analysis scripts make use of Snakemake and have been tested under a Linux environment.
-They have been developed and tested using the following packages/tools (older versions might now work properly):
+They have been developed and tested using the following packages/tools (older versions might not work as intended):
 
-+ [miniconda3](https://conda.io/en/latest/miniconda.html) (Python 3.7)
-+ [Snakemake](https://snakemake.readthedocs.io) (version 5.26.1)
-+ [Strainberry](https://github.com/rvicedomini/strainberry) (version 1.0)
++ [miniconda3](https://conda.io/en/latest/miniconda.html) (Python 3.8)
++ [Snakemake](https://snakemake.readthedocs.io) (version 6.0.5)
++ [Strainberry](https://github.com/rvicedomini/strainberry) (version 1.1)
 
 ## Before running the workflows
 
@@ -55,8 +52,7 @@ The following configuration files are available in the `config` sub-directory in
 Strainberry main results on a single dataset at a time:
 
 + `mock3.yaml` - Mock3 dataset
-+ `mock9_n2.yaml` - Mock9 dataset with a two-strain separation
-+ `mock9_n3.yaml` - Mock9 dataset with a three-strain separation
++ `mock9.yaml` - Mock9 dataset
 + `nwc2_pacbio.yaml` - NWC2 dataset (PacBio)
 + `nwc2_ont.yaml` - NWC2 dataset (Nanopore)
 + `hsm.yaml` - Human Stool Microbiome dataset
